@@ -1,0 +1,50 @@
+package constants
+
+// Log keys
+const (
+	LogServiceName         = "serviceName"
+	LogTypeService         = "service"
+	LogTypeKey             = "middlewareLog"
+	LogLatencyKey          = "latency"
+	LogPathKey             = "path"
+	LogRequestMethodKey    = "method"
+	LogExtMethodKey        = "extMethod"
+	LogExtPathKey          = "extPath"
+	LogClientIPKey         = "clientIP"
+	LogRequestKey          = "request"
+	LogResponseKey         = "response"
+	LogStatusCodeKey       = "statusCode"
+	LogTagKey              = "tag"
+	LogAppNameKey          = "appName"
+	LogAppVersionKey       = "appVersion"
+	LogDeviceIDKey         = "deviceID"
+	LogDeviceTypeKey       = "deviceType"
+	LogClientIPByClient    = "clientIPByClient"
+	LogTypeHTTP            = "http_call"
+	LogTypeMsg             = "Normal_text"
+	LogRequestTimeKey      = "requestTime"
+	LogResponseTimeKey     = "responseTime"
+	LogLocationKey         = "location"
+	LogMACAddressKey       = "MACAddress"
+	LogOSKey               = "operatingSystem"
+	LogSourceKey           = "source"
+	LogSourceKeyV2         = "sourceV2"
+	LogSourceIDKey         = "sourceID"
+	AmazonTraceIDHeaderKey = "X-Amzn-Trace-Id"
+	LogAmazonTraceIDKey    = "amazonTraceID"
+	LogHeaderKey           = "headers"
+	GetLocationHeaderKey   = "X-Amzn-Waf-Geo-Location"
+	SourceHeaderKeyV2      = "x-source-v2"
+	EnableHeaderLog        = "enableLogHeader"
+	AcceptLanguage         = "Accept-Language"
+)
+
+// Log Levels
+const (
+	DebugLevel = "debug"
+	InfoLevel  = "info"
+	WarnLevel  = "warn"
+	ErrorLevel = "error"
+	FatalLevel = "fatal"
+	PanicLevel = "panic"
+)

@@ -1,0 +1,17 @@
+
+
+orginsAllowedForCors: "localhost:8080,http://localhost:8080,https://localhost:8080,^(.*(\\.)(upswing)(\\.)(one))$,^(.*(\\.)(angelone|angelbroking)(\\.)(in|com))$"
+
+whitelistedHostHeader: "localhost:8080,http://localhost:8080,https://localhost:8080,^(.*(\\.)(upswing)(\\.)(one))$,^(.*(\\.)(angelone|angelbroking)(\\.)(in|com))$"
+
+# cron jobs
+jobsDisabled: false
+tokenRenewalCron: "@every 10s"
+portfolioUpdateCron: "0 6 * * *"
+pendingJourneyUpdateCron: "@every 5m"
+
+portfolioProvider: "upswing"
+portfolioUpdateBatchSize: 50
+
+pendingJourneyUpdateBatchSize: 50
+pendingJourneyProvider: "upswing"

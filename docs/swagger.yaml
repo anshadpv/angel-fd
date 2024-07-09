@@ -1,0 +1,545 @@
+definitions:
+  errors.ErrResponse:
+    properties:
+      message:
+        type: string
+      reason:
+        type: string
+    type: object
+  model.APIResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  model.CompareFSIDetails:
+    properties:
+      bankAccount:
+        type: string
+      fsi:
+        type: string
+      imageUrl:
+        type: string
+      insuredAmount:
+        type: integer
+      minDeposit:
+        type: integer
+      name:
+        type: string
+      seniorCitizenBenefit:
+        type: boolean
+      yearlyInterestRate:
+        $ref: '#/definitions/model.YearlyInterestRate'
+    type: object
+  model.CurrentAmount:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+    type: object
+  model.FAQ:
+    properties:
+      content:
+        example: It will take 4 to 5 business days after realisation of funds
+        type: string
+      contentType:
+        example: json
+        type: string
+      question:
+        example: When will my portfolio will get updated?
+        type: string
+    type: object
+  model.FAQResponse:
+    properties:
+      faqs:
+        items:
+          $ref: '#/definitions/model.FAQ'
+        type: array
+      status:
+        example: success
+        type: string
+    type: object
+  model.FsiDetails:
+    properties:
+      fsi:
+        type: string
+      imageUrl:
+        type: string
+      interestRate:
+        type: number
+      name:
+        type: string
+    type: object
+  model.FsiList:
+    properties:
+      fsiList:
+        items:
+          $ref: '#/definitions/model.FsiDetails'
+        type: array
+    type: object
+  model.FsiPlans:
+    properties:
+      about:
+        additionalProperties: true
+        type: object
+      compareFsi:
+        type: string
+      compareFsiImageUrl:
+        type: string
+      compareFsiInterestRate:
+        type: number
+      compareFsiName:
+        type: string
+      insuredAmount:
+        type: integer
+      maxInterestRate:
+        type: number
+      minInvestment:
+        type: integer
+      plans:
+        items:
+          $ref: '#/definitions/model.Plan'
+        type: array
+    type: object
+  model.Homepage:
+    properties:
+      allFDs:
+        items:
+          $ref: '#/definitions/model.Plan'
+        type: array
+      journey:
+        $ref: '#/definitions/model.Journey'
+      mostBought:
+        items:
+          $ref: '#/definitions/model.Plan'
+        type: array
+    type: object
+  model.Journey:
+    properties:
+      pending:
+        type: boolean
+      pendingState:
+        $ref: '#/definitions/model.PendingState'
+    type: object
+  model.NetWorthResponse:
+    properties:
+      activeTermDepositCount:
+        type: integer
+      currentAmount:
+        $ref: '#/definitions/model.CurrentAmount'
+      totalInterestEarned:
+        $ref: '#/definitions/model.TotalInterestEarned'
+      totalInvestedAmount:
+        $ref: '#/definitions/model.TotalInvestedAmount'
+    type: object
+  model.PCIRegistrationResponse:
+    properties:
+      guestSessionToken:
+        type: string
+      ici:
+        type: string
+    type: object
+  model.PendingState:
+    properties:
+      kyc:
+        type: boolean
+      payment:
+        type: boolean
+    type: object
+  model.Plan:
+    properties:
+      description:
+        type: string
+      fsi:
+        type: string
+      imageUrl:
+        type: string
+      insuredAmount:
+        type: integer
+      interestRate:
+        type: number
+      lockinMonths:
+        type: integer
+      name:
+        type: string
+      seniorCitizen:
+        type: number
+      tenureDays:
+        type: integer
+      tenureMonths:
+        type: integer
+      tenureYears:
+        type: integer
+      type:
+        type: string
+      womenBenefit:
+        type: number
+    type: object
+  model.Plans:
+    properties:
+      plans:
+        items:
+          $ref: '#/definitions/model.Plan'
+        type: array
+    type: object
+  model.TotalInterestEarned:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+    type: object
+  model.TotalInvestedAmount:
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+    type: object
+  model.YearlyInterestRate:
+    properties:
+      0_to_1Y:
+        type: number
+      1_to_2Y:
+        type: number
+      2_to_3Y:
+        type: number
+      3_to_4Y:
+        type: number
+      4_to_5Y:
+        type: number
+      5_to_6Y:
+        type: number
+    type: object
+info:
+  contact:
+    name: Madhan Ganesh
+  description: Fixed Deposit Backend & API service
+  termsOfService: https://swagger.io/terms/
+  title: FD Backend/API Service
+  version: "1.0"
+paths:
+  /v1/compare:
+    get:
+      description: Compare FD details for specified FSIs
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      - description: fsi name
+        in: query
+        name: fsi1
+        required: true
+        type: string
+      - description: fsi name
+        in: query
+        name: fsi2
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  additionalProperties:
+                    $ref: '#/definitions/model.CompareFSIDetails'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Perform comparision
+      tags:
+      - Compare
+  /v1/compare/list:
+    get:
+      description: Fetches all FSIs that are eligible for comparision
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.FsiList'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get comparable FSIs
+      tags:
+      - Compare
+  /v1/faqs/{tag}:
+    get:
+      description: Get all FAQs pertaining to home page or FSI
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      - description: home or fsi-name
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.FAQResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get FAQs
+      tags:
+      - FAQ
+  /v1/home:
+    get:
+      description: Get all data pertaining to home page
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Homepage'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get Homepage data
+      tags:
+      - Home
+  /v1/plans:
+    get:
+      description: Fetch all plan details across all banks/FSIs
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Plans'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get all plans & details
+      tags:
+      - Plans
+  /v1/plans/{fsi}:
+    get:
+      description: Fetches all plans and details for the specified bank/FSI
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      - description: fsi name
+        in: path
+        name: fsi
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.FsiPlans'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get FSI plans & details
+      tags:
+      - Plans
+  /v1/portfolio:
+    get:
+      description: Get Portfolio summary
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.NetWorthResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get Portfolio Summary
+      tags:
+      - Portfolio
+  /v1/token/{provider}:
+    get:
+      description: Get token from vendor for given clientCode
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      - description: source
+        in: header
+        name: X-Source
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.PCIRegistrationResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get token from vendor
+      tags:
+      - Provider
+swagger: "2.0"

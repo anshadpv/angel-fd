@@ -1,0 +1,107 @@
+upswingGenerateToken:
+  method: POST
+  url: https://idp.uat-upswing.one/realms/AngelOne/protocol/openid-connect/token
+  headers:
+    Content-Type: application/x-www-form-urlencoded
+  timeoutinmillis: 10000
+  tlshandshaketimeoutinmillis: 500
+  retrycount: 3
+  backoffpolicy:
+    constantbackoff:
+      intervalinmillis: 2
+      maxjitterintervalinmillis: 5
+  hystrixconfig:
+    hystrixtimeoutinmillis: 10000
+    maxconcurrentrequests: 100
+    errorpercentthresold: 50
+    sleepwindowinmillis: 500
+    requestvolumethreshold: 20
+
+upswingPCIRegistration:
+  method: POST
+  url: https://partner.api.uat-upswing.one/v1/term-deposit/customer/register
+  headers:
+    Content-Type: application/json
+  timeoutinmillis: 10000
+  tlshandshaketimeoutinmillis: 500
+  retrycount: 3
+  backoffpolicy:
+    constantbackoff:
+      intervalinmillis: 2
+      maxjitterintervalinmillis: 5
+  hystrixconfig:
+    hystrixtimeoutinmillis: 10000
+    maxconcurrentrequests: 100
+    errorpercentthresold: 50
+    sleepwindowinmillis: 500
+    requestvolumethreshold: 20
+
+upswingNetWorth:
+  method: GET
+  url: https://partner.api.uat-upswing.one/v1/term-deposit/deposits/netWorth/{pci}
+  headers:
+    Content-Type: application/json
+  timeoutinmillis: 10000
+  tlshandshaketimeoutinmillis: 500
+  retrycount: 3
+  backoffpolicy:
+    constantbackoff:
+      intervalinmillis: 2
+      maxjitterintervalinmillis: 5
+  hystrixconfig:
+    hystrixtimeoutinmillis: 10000
+    maxconcurrentrequests: 100
+    errorpercentthresold: 50
+    sleepwindowinmillis: 500
+    requestvolumethreshold: 20
+
+upswingDataIngestion:
+  method: POST
+  url: https://partner.api.uat-upswing.one/v1/term-deposit/partnerData/ingest?pci={pci}
+  headers:
+    Content-Type: application/json
+  timeoutinmillis: 10000
+  tlshandshaketimeoutinmillis: 500
+  retrycount: 3
+  backoffpolicy:
+    constantbackoff:
+      intervalinmillis: 2
+      maxjitterintervalinmillis: 5
+  hystrixconfig:
+    hystrixtimeoutinmillis: 10000
+    maxconcurrentrequests: 100
+    errorpercentthresold: 50
+    sleepwindowinmillis: 500
+    requestvolumethreshold: 20
+
+profileServiceConfig:
+  url: http://internal-bbe-profile-uat-alb2-474368331.ap-south-1.elb.amazonaws.com/v1/profile/get
+  method: GET
+  timeoutinmillis: 20000
+  retrycount: 3
+  headers:
+    s2sEnabled: true
+    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJjb3VudHJ5X2NvZGUiOiIiLCJtb2Jfbm8iOiIiLCJ1c2VyX2lkIjoiU0dCMi4wLVVBVCIsInNvdXJjZSI6IjM2MWIyODBjLWU0NWQtNDJiNi05ZjE2LWQwNjcyOWI3ZWY0YyIsImFwcF9pZCI6IiIsImNyZWF0ZWRfYXQiOiIyMDIzLTA2LTAxVDA3OjU5OjM5LjE0OTU1ODU5MVoiLCJkYXRhQ2VudGVyIjoiIn0sIm9tbmVtYW5hZ2VyaWQiOjAsInRva2VuIjoiIiwic291cmNlaWQiOiIiLCJ1c2VyX3R5cGUiOiJhcHBsaWNhdGlvbiIsInJlcXVlc3RlZF90b2tlbl90eXBlIjoiYWNjZXNzX3Rva2VuIiwic291cmNlIjoiMzYxYjI4MGMtZTQ1ZC00MmI2LTlmMTYtZDA2NzI5YjdlZjRjIiwiYWN0Ijp7InN1YiI6IjM2MWIyODBjLWU0NWQtNDJiNi05ZjE2LWQwNjcyOWI3ZWY0YyJ9LCJpc3MiOiJBbmdlbEJyb2tpbmciLCJzdWIiOiIzNjFiMjgwYy1lNDVkLTQyYjYtOWYxNi1kMDY3MjliN2VmNGMiLCJhdWQiOlsiMzZiMDc3NGMtZDcyMC00ODQ1LTg1OTAtYjVhMGYyNzk1YjY5Il0sImV4cCI6MTc0OTUzNzMyMiwiaWF0IjoxNjg1NjA2Mzc5LCJqdGkiOiIxMzQxMTZiOC1hMWU0LTQ3ZjMtYTljNi00NmUwOWMwYTQ2YmQifQ.1oc0eOtGgqlRIgFd4bkQjEZjkJliOadzPOlhDOM1nE0
+  backoffpolicy:
+    constantbackoff:
+      intervalinmillis: 5
+      maxjitterintervalinmillis: 10
+
+upswingPendingJourney:
+  method: GET
+  url: https://partner.api.uat-upswing.one/v1/term-deposit/customer/pendingJourney
+  headers:
+    Content-Type: application/json
+  timeoutinmillis: 10000
+  tlshandshaketimeoutinmillis: 500
+  retrycount: 3
+  backoffpolicy:
+    constantbackoff:
+      intervalinmillis: 2
+      maxjitterintervalinmillis: 5
+  hystrixconfig:
+    hystrixtimeoutinmillis: 10000
+    maxconcurrentrequests: 100
+    errorpercentthresold: 50
+    sleepwindowinmillis: 500
+    requestvolumethreshold: 20

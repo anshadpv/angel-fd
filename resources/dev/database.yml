@@ -1,0 +1,8 @@
+postgres-db:
+  drivername: postgres
+  url: "postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_URL}/${DATABASE_NAME}?sslmode=disable&connect_timeout=10"
+  maxopenconnections: 5
+  maxidleconnections: 3
+  connectionmaxlifetimeinseconds: 30
+  connectionmaxidletimeinseconds: 30
+  querytimeout: 30
