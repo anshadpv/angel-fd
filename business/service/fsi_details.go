@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/angel-one/fd-core/business/model"
 	"github.com/angel-one/fd-core/business/repository/dao"
@@ -22,7 +23,7 @@ func DefaultFsiDetailService() FsiDetailService {
 
 func (service *fsiDetailServiceImpl) GetFsiDetails(ctx context.Context, fsiDetailsKeys []string, fsiDetailsValues []string) (map[string]model.FsiStruct, error) {
 	responseMap := map[string]model.FsiStruct{}
-	//fsiDetails := model.FsiStruct{}
+	fsiDetails := model.FsiStruct{}
 	fmt.Println("REACHED HERE !!!! 222222")
 
 	fsiDetailsPlan, err := service.fsiDetailsDAO.FetchFsiDetailsList(ctx, fsiDetailsValues)
@@ -30,27 +31,28 @@ func (service *fsiDetailServiceImpl) GetFsiDetails(ctx context.Context, fsiDetai
 		return responseMap, err
 	}
 
-	fmt.Println(fsiDetailsPlan)
-	// fsiDetailsMap := make(map[string][]model.FsiStruct)
-	// for _, detail := range fsiDetailsPlan {
-	// 	fsiDetailsMap[detail.Plans.Fsi] = append(fsiDetailsMap[detail.Plans.fsi], detail)
-	// }
+	fmt.Println("WE HAVEE REEAACHHEDDD HHEERRREEEE")
+	fsiDetailsMap := make(map[string][]model.FsiStruct)
+	for _, details := range fsiDetailsPlan {
+		for _, detail := range details.Plans {
+			fsiDetailsMap[detail.Fsi] = append(fsiDetailsMap[detail.Fsi], details)
+		}
+	}
 
-	// for _, details := range fsiDetailsMap {
-	// 	for _, detail := range details {
-	// 		compareFsiDetails.FSI = detail.FSI
-	// 		compareFsiDetails.Name = detail.Name
-	// 		compareFsiDetails.MinDeposit = detail.MinDeposit
-	// 		compareFsiDetails.SeniorCitizenBenefit = detail.SeniorCitizenBenefit
-	// 		compareFsiDetails.BankAccount = detail.BankAccount
-	// 		compareFsiDetails.InsuredAmount = detail.InsuredAmount
-	// 		compareFsiDetails.ImageURL = detail.ImageURL
-	// 	}
+	for _, details := range fsiDetailsMap {
+		for _, detail := range details {
+			fsiDetails.Plans = detail.Plans
+			fsiDetails.About = detail.About
+			fsiDetails.Calculator = detail.Calculator
+			fsiDetails.FAQs = detail.FAQs
 
-	// 	index := slices.Index(compareFsiValues, compareFsiDetails.FSI)
-	// 	key := compareFsiKeys[index]
-	// 	responseMap[key] = compareFsiDetails
-	// }
+			for _, fsi := range detail.Plans {
+				index := slices.Index(fsiDetailsValues, fsi.Fsi)
+				key := fsiDetailsKeys[index]
+				responseMap[key] = fsiDetails
+			}
+		}
+	}
 
 	return responseMap, nil
 }

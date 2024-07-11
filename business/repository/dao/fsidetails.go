@@ -36,17 +36,26 @@ func (d *fsiDetailsDAOImpl) FetchFsiDetailsList(ctx context.Context, fsis []stri
 		fsiPlaceholders[i] = fmt.Sprintf("$%d", i+1)
 		placeholderValues[i] = fsi
 	}
+	fmt.Println(fsiPlaceholders)
+	fmt.Println(placeholderValues...)
+
 	quotedPlaceholderString := strings.Join(fsiPlaceholders, ", ")
+
+	fmt.Println(quotedPlaceholderString)
 
 	query := fmt.Sprintf(FsiDetailsQuery, quotedPlaceholderString)
 
+	fmt.Println(query)
+
 	rows, err := d.db.QueryContext(ctx, query, placeholderValues...)
+	fmt.Println(rows)
 	if err != nil && err != sql.ErrNoRows {
 		return FsiStructs, fmt.Errorf("%s%w", "Error while fetching FSI Details: ", err)
 	}
 
 	defer rows.Close()
 	for rows.Next() {
+		fmt.Println("ENTERED HEREEEEEEEEEE")
 		var FsiStruct model.FsiStruct
 		var FsiDetail model.FsiDetailPlans
 
@@ -79,9 +88,12 @@ func (d *fsiDetailsDAOImpl) FetchFsiDetailsList(ctx context.Context, fsis []stri
 			return FsiStructs, err
 		}
 
-		var faq model.FAQ
+		var faq []model.FAQ
 		tag := FsiDetail.Fsi
 		rows, err := d.db.QueryContext(ctx, GetFAQsByTag, tag)
+		if err != nil {
+			return FsiStructs, err
+		}
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&faqData)
@@ -89,10 +101,14 @@ func (d *fsiDetailsDAOImpl) FetchFsiDetailsList(ctx context.Context, fsis []stri
 				return FsiStructs, err
 			}
 		}
+
 		err = json.Unmarshal(faqData, &faq)
 		if err != nil {
-			FsiStruct.FAQs = append(FsiStruct.FAQs, faq)
+			return FsiStructs, err
 		}
+
+		FsiStruct.FAQs = faq
+		FsiStructs = append(FsiStructs, FsiStruct)
 
 	}
 	return FsiStructs, nil

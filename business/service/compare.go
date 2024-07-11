@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/angel-one/fd-core/business/model"
 	"github.com/angel-one/fd-core/business/repository/dao"
@@ -45,6 +46,7 @@ func (service *compareServiceImpl) GetCompareFsiDetails(ctx context.Context, com
 	for _, detail := range compareFsiDBDetails {
 		fsiDetailsMap[detail.FSI] = append(fsiDetailsMap[detail.FSI], detail)
 	}
+	fmt.Println(fsiDetailsMap)
 
 	for _, details := range fsiDetailsMap {
 		yearlyInterestRate := map[int]float64{}

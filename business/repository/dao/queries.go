@@ -205,7 +205,10 @@ ORDER BY
 	COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
 	b.image_url AS "imageUrl",
 	b.insurance_description AS "description",
-	b.insured_amount AS "insuredAmount",
+	CASE
+		WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+		ELSE 0
+	END AS "insuredAmount",
 	b.about,
 	b.calculator
 	FROM 
@@ -215,7 +218,7 @@ ORDER BY
 	WHERE 
     	p.is_active = TRUE AND p.fsi IN (%s)
 	GROUP BY 
-    	b.fsi, b.name, p.is_insured,p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, b.insured_amount, b.insurance_description`
+		p.fsi, b.fsi, p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, p.is_insured`
 )
 
 // portfolio
