@@ -75,6 +75,8 @@ const (
 	Jobs           = "/jobs"
 	Update         = "/update"
 	PendingJourney = "/pendingJourney"
+	Fsi            = "/fsi"
+	Details        = "/details"
 )
 
 const (

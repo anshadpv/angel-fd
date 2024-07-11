@@ -194,6 +194,28 @@ GROUP BY
     b.fsi, b.name, p.tenure_years, p.tenure_months, p.tenure_days, b.min_investment_amount, p.is_insured, b.insurance_description
 ORDER BY 
     p.tenure_years;`
+
+	FsiDetailsQuery = `SELECT 
+    b.fsi AS "fsi",
+    b.name AS "name",
+	p.plan_type AS "type",
+    MAX(p.interest_rate) AS "interestRate",
+	p.lockin_months AS "lockinMonths",
+	COALESCE(p.women_benefit, 0) AS "womenBenefit",
+	COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+	b.image_url AS "imageUrl",
+	b.insurance_description AS "description",
+	b.insured_amount AS "insuredAmount",
+	b.about,
+	b.calculator
+	FROM 
+    	plans AS p
+	JOIN
+    	banks AS b ON p.fsi = b.fsi
+	WHERE 
+    	p.is_active = TRUE AND p.fsi IN (%s)
+	GROUP BY 
+    	b.fsi, b.name, p.is_insured,p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, b.insured_amount, b.insurance_description`
 )
 
 // portfolio
