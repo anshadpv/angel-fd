@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"slices"
 
 	"github.com/angel-one/fd-core/business/model"
@@ -24,14 +23,12 @@ func DefaultFsiDetailService() FsiDetailService {
 func (service *fsiDetailServiceImpl) GetFsiDetails(ctx context.Context, fsiDetailsKeys []string, fsiDetailsValues []string) (map[string]model.FsiStruct, error) {
 	responseMap := map[string]model.FsiStruct{}
 	fsiDetails := model.FsiStruct{}
-	fmt.Println("REACHED HERE !!!! 222222")
 
 	fsiDetailsPlan, err := service.fsiDetailsDAO.FetchFsiDetailsList(ctx, fsiDetailsValues)
 	if err != nil {
 		return responseMap, err
 	}
 
-	fmt.Println("WE HAVEE REEAACHHEDDD HHEERRREEEE")
 	fsiDetailsMap := make(map[string][]model.FsiStruct)
 	for _, details := range fsiDetailsPlan {
 		for _, detail := range details.Plans {

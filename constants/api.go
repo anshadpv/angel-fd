@@ -77,6 +77,7 @@ const (
 	PendingJourney = "/pendingJourney"
 	Fsi            = "/fsi"
 	Details        = "/details"
+	HomeInfo       = "/homeInfo"
 )
 
 const (

@@ -49,6 +49,100 @@ const (
 		"row_num" = 1;
 	
 `
+
+	FetchFDHighIR = `WITH RankedPlans AS (
+	SELECT
+		p.fsi AS "fsi",
+		b.name AS "name",
+		p.plan_type AS "type",
+		p.tenure_years AS "tenureYears",
+		p.tenure_months AS "tenureMonths",
+		p.tenure_days AS "tenureDays",
+		p.interest_rate AS "interestRate",
+		p.lockin_months AS "lockinMonths",
+		COALESCE(p.women_benefit, 0) AS "womenBenefit",
+		COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+		b.image_url AS "imageUrl",
+		p.is_mostbought as "isMostbought",
+		'' AS "description",
+		CASE
+			WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+			ELSE 0
+		END AS "insuredAmount",
+		ROW_NUMBER() OVER (PARTITION BY p.fsi ORDER BY p.interest_rate DESC) AS "row_num"
+	FROM
+		plans p
+	LEFT JOIN
+		banks b ON p.fsi = b.fsi
+	WHERE p.is_active = true
+)
+SELECT
+	"fsi",
+	"name",
+	"type",
+	"tenureYears",
+	"tenureMonths",
+	"tenureDays",
+	"interestRate",
+	"lockinMonths",
+	"womenBenefit",
+	"seniorCitizen",
+	"imageUrl",
+	"isMostbought",
+	"description",
+	"insuredAmount"
+FROM
+	RankedPlans
+WHERE
+	"row_num" = 1;
+`
+	FetchFDMinIR = `WITH RankedPlans AS (
+	SELECT
+		p.fsi AS "fsi",
+		b.name AS "name",
+		p.plan_type AS "type",
+		p.tenure_years AS "tenureYears",
+		p.tenure_months AS "tenureMonths",
+		p.tenure_days AS "tenureDays",
+		p.interest_rate AS "interestRate",
+		p.lockin_months AS "lockinMonths",
+		COALESCE(p.women_benefit, 0) AS "womenBenefit",
+		COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+		b.image_url AS "imageUrl",
+		p.is_mostbought as "isMostbought",
+		'' AS "description",
+		CASE
+			WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+			ELSE 0
+		END AS "insuredAmount",
+		ROW_NUMBER() OVER (PARTITION BY p.fsi ORDER BY p.interest_rate ASC) AS "row_num"
+	FROM
+		plans p
+	LEFT JOIN
+		banks b ON p.fsi = b.fsi
+	WHERE p.is_active = true
+)
+SELECT
+	"fsi",
+	"name",
+	"type",
+	"tenureYears",
+	"tenureMonths",
+	"tenureDays",
+	"interestRate",
+	"lockinMonths",
+	"womenBenefit",
+	"seniorCitizen",
+	"imageUrl",
+	"isMostbought",
+	"description",
+	"insuredAmount"
+FROM
+	RankedPlans
+WHERE
+	"row_num" = 1;
+
+`
 	BaseFetchPlanQuery = `SELECT
 	p.fsi AS "fsi",
 	b.name AS "name",
