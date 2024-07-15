@@ -66,6 +66,7 @@ func DefaultRouter(ctx context.Context) *gin.Engine {
 	InitJobsRoute(v1Group)
 	InitFsiDetails(v1Group)
 	InitHomeInfoRoute(v1Group)
+	InitUpswingRoute(v1Group)
 
 	// init invalid routes
 	initNoRoute(router)

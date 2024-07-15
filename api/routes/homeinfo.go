@@ -13,7 +13,6 @@ func InitHomeInfoRoute(vGroups ...*gin.RouterGroup) {
 func initHomeInfoV1Group(v1Group *gin.RouterGroup) {
 	homeInfoController := v1.DefaultHomeInfoController()
 	plans := v1Group.Group(constants.HomeInfo)
-
 	{
 		plans.GET("", homeInfoController.GetHomeInfopage)
 	}

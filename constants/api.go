@@ -78,6 +78,7 @@ const (
 	Fsi            = "/fsi"
 	Details        = "/details"
 	HomeInfo       = "/homeInfo"
+	Upswing        = "/upswing"
 )
 
 const (
