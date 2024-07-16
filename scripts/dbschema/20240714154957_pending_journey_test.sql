@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS pending_journey_test (
 	kyc_pending bool NULL,
 	created_at timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-	created_by varchar(50) NULL,
-	updated_by varchar(50) NULL,
+	created_by varchar(50) NOT NULL,
+	updated_by varchar(50) NOT NULL,
 	CONSTRAINT pending_journey_test_pkey PRIMARY KEY (id),
 	CONSTRAINT unique_clientcode_provider_test UNIQUE (client_code, provider)
 );

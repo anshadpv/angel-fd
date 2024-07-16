@@ -11,23 +11,23 @@ import (
 	"github.com/angel-one/goerr"
 )
 
-type PendingJourneyDAO interface {
-	FetchClientList(ctx context.Context, provider string, instantRefresh bool) ([]string, error)
-	FetchPendingJourneyDetails(ctx context.Context, clientCode string, provider string) (*entity.PendingJourneyEntity, error)
-	BatchUpdatePendingJourney(ctx context.Context, pendingJourneyEntities []entity.PendingJourneyEntity) error
-	UpdateRefreshedPendingJourneyClientList(ctx context.Context, provider string, clientList []string) error
-	CleanStaleRecords(ctx context.Context) error
+type PendingJourneyDAOTest interface {
+	FetchClientListTest(ctx context.Context, provider string, instantRefresh bool) ([]string, error)
+	FetchPendingJourneyDetailsTest(ctx context.Context, clientCode string, provider string) (*entity.PendingJourneyEntity, error)
+	BatchUpdatePendingJourneyTest(ctx context.Context, pendingJourneyEntities []entity.PendingJourneyEntity) error
+	UpdateRefreshedPendingJourneyClientListTest(ctx context.Context, provider string, clientList []string) error
+	CleanStaleRecordsTest(ctx context.Context) error
 }
 
-type pendingJourneyDAOImpl struct {
+type pendingJourneyDAOTestImpl struct {
 	db *sql.DB
 }
 
-func DefaultPendingJourneyDAO() PendingJourneyDAO {
-	return &pendingJourneyDAOImpl{db: database.GetDBPool(true)}
+func DefaultPendingJourneyDAOTest() PendingJourneyDAOTest {
+	return &pendingJourneyDAOTestImpl{db: database.GetDBPool(true)}
 }
 
-func (p *pendingJourneyDAOImpl) FetchPendingJourneyDetails(ctx context.Context, clientCode string, provider string) (*entity.PendingJourneyEntity, error) {
+func (p *pendingJourneyDAOTestImpl) FetchPendingJourneyDetailsTest(ctx context.Context, clientCode string, provider string) (*entity.PendingJourneyEntity, error) {
 	var entity entity.PendingJourneyEntity
 	err := p.db.QueryRowContext(ctx, FetchPendingForClient, clientCode, provider).Scan(&entity.Pending, &entity.Payment, &entity.KYC)
 	if err != nil {
@@ -40,15 +40,15 @@ func (p *pendingJourneyDAOImpl) FetchPendingJourneyDetails(ctx context.Context, 
 	return &entity, nil
 }
 
-func (p *pendingJourneyDAOImpl) FetchClientList(ctx context.Context, provider string, instantRefresh bool) ([]string, error) {
+func (p *pendingJourneyDAOTestImpl) FetchClientListTest(ctx context.Context, provider string, instantRefresh bool) ([]string, error) {
 	var clientList []string
 	var rows *sql.Rows
 	var err error
 
 	if instantRefresh {
-		rows, err = p.db.QueryContext(ctx, FetchRefreshPendingJourneyClientListByProviderTest, provider, false, true)
+		rows, err = p.db.QueryContext(ctx, FetchRefreshPendingJourneyClientListByProvider, provider, false, true)
 	} else {
-		rows, err = p.db.QueryContext(ctx, FetchPendingJourneyClientListByProviderTest, provider, false)
+		rows, err = p.db.QueryContext(ctx, FetchPendingJourneyClientListByProvider, provider, false)
 	}
 	if err != nil && err != sql.ErrNoRows {
 		return clientList, err
@@ -69,13 +69,13 @@ func (p *pendingJourneyDAOImpl) FetchClientList(ctx context.Context, provider st
 	return clientList, nil
 }
 
-func (p *pendingJourneyDAOImpl) BatchUpdatePendingJourney(ctx context.Context, pendingJourneyEntities []entity.PendingJourneyEntity) error {
+func (p *pendingJourneyDAOTestImpl) BatchUpdatePendingJourneyTest(ctx context.Context, pendingJourneyEntities []entity.PendingJourneyEntity) error {
 	if len(pendingJourneyEntities) == 0 {
 		return nil
 	}
 
 	var queryBuilder strings.Builder
-	queryBuilder.WriteString(InsertPendingJourneyDetailsTest)
+	queryBuilder.WriteString(InsertPendingJourneyDetails)
 
 	values := []interface{}{}
 	valueStrings := []string{}
@@ -89,7 +89,7 @@ func (p *pendingJourneyDAOImpl) BatchUpdatePendingJourney(ctx context.Context, p
 	}
 
 	queryBuilder.WriteString(strings.Join(valueStrings, ", "))
-	queryBuilder.WriteString(UpdatePendingJourneyDetailsTest)
+	queryBuilder.WriteString(UpdatePendingJourneyDetails)
 	query := queryBuilder.String()
 
 	// Execute the batch update
@@ -101,7 +101,7 @@ func (p *pendingJourneyDAOImpl) BatchUpdatePendingJourney(ctx context.Context, p
 	return nil
 }
 
-func (p *pendingJourneyDAOImpl) UpdateRefreshedPendingJourneyClientList(ctx context.Context, provider string, clientList []string) error {
+func (p *pendingJourneyDAOTestImpl) UpdateRefreshedPendingJourneyClientListTest(ctx context.Context, provider string, clientList []string) error {
 	if len(clientList) == 0 {
 		return nil
 	}
@@ -115,7 +115,7 @@ func (p *pendingJourneyDAOImpl) UpdateRefreshedPendingJourneyClientList(ctx cont
 
 	placeholderString := strings.Join(placeholders, ", ")
 
-	query := fmt.Sprintf(UpdateRefreshPendingJourneyClientListTest, placeholderString)
+	query := fmt.Sprintf(UpdateRefreshPendingJourneyClientList, placeholderString)
 
 	_, err := p.db.ExecContext(ctx, query, args...)
 
@@ -126,9 +126,9 @@ func (p *pendingJourneyDAOImpl) UpdateRefreshedPendingJourneyClientList(ctx cont
 	return nil
 }
 
-func (p *pendingJourneyDAOImpl) CleanStaleRecords(ctx context.Context) error {
+func (p *pendingJourneyDAOTestImpl) CleanStaleRecordsTest(ctx context.Context) error {
 
-	_, err := p.db.ExecContext(ctx, CleanStalePendingJourneyRecordsTest)
+	_, err := p.db.ExecContext(ctx, CleanStalePendingJourneyRecords)
 
 	if err != nil {
 		return err

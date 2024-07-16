@@ -233,7 +233,9 @@ WHERE
 
 	FetchPendingJourneyDetails = `select pending, payment_pending, kyc_pending from pending_journey`
 
-	FetchPendingForClient = FetchPendingJourneyDetails + ` where client_code = $1 and provider = $2`
+	FetchPendingJourneyDetailsTest = `select pending, payment_pending, kyc_pending from pending_journey_test`
+
+	FetchPendingForClient = FetchPendingJourneyDetailsTest + ` where client_code = $1 and provider = $2`
 
 	GetFAQsByTag = `select faq from faqs where tag=$1 and is_active=true`
 
@@ -349,17 +351,38 @@ const (
 const (
 	FetchPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1  and invalid_client = $2"
 
+	FetchPendingJourneyClientListByProviderTest = "select client_code from pending_journey_Test where provider = $1  and invalid_client = $2"
+
 	FetchRefreshPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1 and invalid_client = $2 and to_be_refreshed = $3"
+
+	FetchRefreshPendingJourneyClientListByProviderTest = "select client_code from pending_journey_test where provider = $1 and invalid_client = $2 and to_be_refreshed = $3"
 
 	CleanStalePendingJourneyRecords = "delete from pending_journey where pending = false"
 
+	CleanStalePendingJourneyRecordsTest = "delete from pending_journey_test where pending = false"
+
 	UpdateRefreshPendingJourneyClientList = "UPDATE pending_journey SET to_be_refreshed = false, updated_by = 'pending_journey_refresher_api', updated_at = current_timestamp WHERE client_code IN (%s);"
+
+	UpdateRefreshPendingJourneyClientListTest = "UPDATE pending_journey_test SET to_be_refreshed = false, updated_by = 'pending_journey_refresher_api', updated_at = current_timestamp WHERE client_code IN (%s);"
 
 	InsertPendingJourneyDetails = `INSERT INTO pending_journey (
 		client_code, provider, pending, payment_pending, kyc_pending, created_by, updated_by, invalid_client, api_error
 	) VALUES `
 
+	InsertPendingJourneyDetailsTest = `INSERT INTO pending_journey_test (
+		client_code, provider, pending, payment_pending, kyc_pending, created_by, updated_by, invalid_client, api_error
+	) VALUES `
+
 	UpdatePendingJourneyDetails = `ON CONFLICT (client_code, provider) DO UPDATE SET
+    pending = EXCLUDED.pending,
+    payment_pending = EXCLUDED.payment_pending,
+    kyc_pending = EXCLUDED.kyc_pending,
+	updated_by = EXCLUDED.updated_by,
+    updated_at =current_timestamp,
+	invalid_client = EXCLUDED.invalid_client,
+	api_error = EXCLUDED.api_error;`
+
+	UpdatePendingJourneyDetailsTest = `ON CONFLICT (client_code, provider) DO UPDATE SET
     pending = EXCLUDED.pending,
     payment_pending = EXCLUDED.payment_pending,
     kyc_pending = EXCLUDED.kyc_pending,

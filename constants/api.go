@@ -79,6 +79,7 @@ const (
 	Details        = "/details"
 	HomeInfo       = "/homeInfo"
 	Upswing        = "/upswing"
+	Pending        = "/pending"
 )
 
 const (

@@ -1,5 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
+ALTER TABLE portfolio_test
+ADD COLUMN to_be_refreshed BOOLEAN NOT NULL DEFAULT false;
 CREATE OR REPLACE FUNCTION public.insert_or_update_portfolio_test_from_wb_events_test()
  RETURNS trigger AS $$
 DECLARE
@@ -18,13 +20,14 @@ BEGIN
                 current_value = current_value + NEW.amount,
                 total_active_deposits = total_active_deposits + 1,
                 updated_at = CURRENT_TIMESTAMP,
-                updated_by = 'wb_events_test'
+                updated_by = 'wb_events_test',
+                to_be_refreshed = true
             WHERE client_code = NEW.client_code AND provider = NEW.vendor;
         ELSE
             -- Insert new record into portfolio table
             INSERT INTO portfolio_test (
-                client_code, provider, invested_value, current_value, total_active_deposits, interest_earned, returns_value, returns_percentage, created_by, updated_by) 
-                VALUES (NEW.client_code, NEW.vendor, NEW.amount, NEW.amount, 1, 0, 0, 0, 'wb_events_test', 'wb_events_test');
+                client_code, provider, invested_value, current_value, total_active_deposits, interest_earned, returns_value, returns_percentage, created_by, updated_by,to_be_refreshed) 
+                VALUES (NEW.client_code, NEW.vendor, NEW.amount, NEW.amount, 1, 0, 0, 0, 'wb_events_test', 'wb_events_test', true);
         END IF;
     END IF;
     RETURN NULL; -- Trigger has completed successfully
@@ -33,6 +36,8 @@ END;
 $$ LANGUAGE plpgsql;
 ;
 
+ALTER TABLE pending_journey_test
+ADD COLUMN to_be_refreshed BOOLEAN NOT NULL DEFAULT false;
 CREATE OR REPLACE FUNCTION public.insert_or_update_pending_journey_test_from_wb_events_test()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -50,12 +55,13 @@ BEGIN
             -- Update the existing row in pending_journey
             UPDATE pending_journey
             SET updated_at = CURRENT_TIMESTAMP,
-                updated_by = 'wb_events_test'
+                updated_by = 'wb_events_test',
+                to_be_refreshed = true
             WHERE client_code = NEW.client_code AND provider = NEW.vendor;
         ELSE
             -- Insert the new row into pending_journey
-            INSERT INTO pending_journey_test (client_code, provider, pending, payment_pending, kyc_pending, created_by, updated_by)
-            VALUES (NEW.client_code, NEW.vendor, FALSE, FALSE, FALSE, 'wb_events_test', 'wb_events_test');
+            INSERT INTO pending_journey_test (client_code, provider, pending, payment_pending, kyc_pending, created_by, updated_by, to_be_refreshed)
+            VALUES (NEW.client_code, NEW.vendor, FALSE, FALSE, FALSE, 'wb_events_test', 'wb_events_test', true);
         END IF;
     END IF;
     RETURN NEW;
@@ -68,6 +74,10 @@ $function$
 
 -- +goose Down
 -- +goose StatementBegin
+ALTER TABLE portfolio_test
+DROP COLUMN to_be_refreshed;
+ALTER TABLE pending_journey_test
+DROP COLUMN to_be_refreshed;
 
 DROP FUNCTION IF EXISTS public.insert_or_update_portfolio_test_from_wb_events_test() CASCADE;
 DROP FUNCTION IF EXISTS public.insert_or_update_pending_journey_test_from_wb_events_test() CASCADE;
