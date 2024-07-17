@@ -27,7 +27,6 @@ func (d *fsiDetailsDAOImpl) FetchFsiDetailsList(ctx context.Context, fsis []stri
 	var FsiStructs []model.FsiStruct
 	var aboutData, calculator []byte
 	var faqData json.RawMessage
-	fmt.Println("IM HERE 333333")
 
 	fsiPlaceholders := make([]string, len(fsis))
 	placeholderValues := make([]interface{}, len(fsis))
@@ -36,12 +35,8 @@ func (d *fsiDetailsDAOImpl) FetchFsiDetailsList(ctx context.Context, fsis []stri
 		fsiPlaceholders[i] = fmt.Sprintf("$%d", i+1)
 		placeholderValues[i] = fsi
 	}
-	fmt.Println(fsiPlaceholders)
-	fmt.Println(placeholderValues...)
 
 	quotedPlaceholderString := strings.Join(fsiPlaceholders, ", ")
-
-	fmt.Println(quotedPlaceholderString)
 
 	query := fmt.Sprintf(FsiDetailsQuery, quotedPlaceholderString)
 
@@ -55,7 +50,6 @@ func (d *fsiDetailsDAOImpl) FetchFsiDetailsList(ctx context.Context, fsis []stri
 
 	defer rows.Close()
 	for rows.Next() {
-		fmt.Println("ENTERED HEREEEEEEEEEE")
 		var FsiStruct model.FsiStruct
 		var FsiDetail model.FsiDetailPlans
 

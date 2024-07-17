@@ -12,9 +12,8 @@ func InitRefresherRoute(vGroups ...*gin.RouterGroup) {
 
 func initRefresherV1Group(v1Group *gin.RouterGroup) {
 	refreshController := v1.DefaultRefresherController()
-
 	refresh := v1Group.Group(constants.Pending)
 	{
-		refresh.GET(constants.PathSplitter+constants.PathParam+constants.Refresher, refreshController.GetPendingJourneyRefresher)
+		refresh.GET(constants.PathParam+constants.Refresher, refreshController.GetPendingJourneyRefresher)
 	}
 }

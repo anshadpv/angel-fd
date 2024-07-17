@@ -21,8 +21,18 @@ func DefaultFsiDetailsController() FsiDetailsController {
 	return FsiDetailsController{FsiDetailService: service.DefaultFsiDetailService()}
 }
 
+// @Summary      Get complete FSI's details
+// @Description  Fetches all the details of FSI's that are eligible for comparision
+// @version 1.0
+// @Tags         Fsi_Details
+// @Produce      json
+// @Param Authorization header string true "authorization token"
+// @Param X-Request-Id header string true "unique request id"
+// @Success      200  {object}  model.APIResponse{data=model.FsiStruct}
+// @Failure	     400  {object}  errors.ErrResponse
+// @Failure      500  {object}  errors.ErrResponse
+// @Router       /v1/fsi/details [GET]
 func (c *FsiDetailsController) GetFsiDetails(gctx *gin.Context) {
-	fmt.Println("REACHED HERE !!!!")
 	ctx := context.Build(gctx)
 	clientCode := context.Get(ctx).UserID
 	log.Debug(ctx).Msgf("ClientCode: %s ", clientCode)

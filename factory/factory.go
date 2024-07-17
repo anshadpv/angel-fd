@@ -12,6 +12,7 @@ var upSwingService external.UpSwing
 var portfolioService v1.PortfolioService
 var portfolioDAO dao.PortfolioDAO
 var pendingJourneyDAO dao.PendingJourneyDAO
+var pendingJourneyDAOTest dao.PendingJourneyDAOTest
 
 func Init(ctx context.Context) {
 	upSwingService = external.DefaultUpSwing(ctx)
@@ -38,4 +39,8 @@ func GetPortfolioDAO() dao.PortfolioDAO {
 
 func GetPendingJourneyDAO() dao.PendingJourneyDAO {
 	return pendingJourneyDAO
+}
+
+func GetPendingJourneyDAOTest() dao.PendingJourneyDAOTest {
+	return pendingJourneyDAOTest
 }

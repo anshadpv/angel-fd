@@ -46,9 +46,9 @@ func (p *pendingJourneyDAOTestImpl) FetchClientListTest(ctx context.Context, pro
 	var err error
 
 	if instantRefresh {
-		rows, err = p.db.QueryContext(ctx, FetchRefreshPendingJourneyClientListByProvider, provider, false, true)
+		rows, err = p.db.QueryContext(ctx, FetchRefreshPendingJourneyClientListByProviderTest, provider, false, true)
 	} else {
-		rows, err = p.db.QueryContext(ctx, FetchPendingJourneyClientListByProvider, provider, false)
+		rows, err = p.db.QueryContext(ctx, FetchPendingJourneyClientListByProviderTest, provider, false)
 	}
 	if err != nil && err != sql.ErrNoRows {
 		return clientList, err
@@ -75,7 +75,7 @@ func (p *pendingJourneyDAOTestImpl) BatchUpdatePendingJourneyTest(ctx context.Co
 	}
 
 	var queryBuilder strings.Builder
-	queryBuilder.WriteString(InsertPendingJourneyDetails)
+	queryBuilder.WriteString(InsertPendingJourneyDetailsTest)
 
 	values := []interface{}{}
 	valueStrings := []string{}
@@ -115,7 +115,7 @@ func (p *pendingJourneyDAOTestImpl) UpdateRefreshedPendingJourneyClientListTest(
 
 	placeholderString := strings.Join(placeholders, ", ")
 
-	query := fmt.Sprintf(UpdateRefreshPendingJourneyClientList, placeholderString)
+	query := fmt.Sprintf(UpdateRefreshPendingJourneyClientListTest, placeholderString)
 
 	_, err := p.db.ExecContext(ctx, query, args...)
 
@@ -128,7 +128,7 @@ func (p *pendingJourneyDAOTestImpl) UpdateRefreshedPendingJourneyClientListTest(
 
 func (p *pendingJourneyDAOTestImpl) CleanStaleRecordsTest(ctx context.Context) error {
 
-	_, err := p.db.ExecContext(ctx, CleanStalePendingJourneyRecords)
+	_, err := p.db.ExecContext(ctx, CleanStalePendingJourneyRecordsTest)
 
 	if err != nil {
 		return err

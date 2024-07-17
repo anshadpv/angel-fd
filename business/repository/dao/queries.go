@@ -351,7 +351,7 @@ const (
 const (
 	FetchPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1  and invalid_client = $2"
 
-	FetchPendingJourneyClientListByProviderTest = "select client_code from pending_journey_Test where provider = $1  and invalid_client = $2"
+	FetchPendingJourneyClientListByProviderTest = "select client_code from pending_journey_test where provider = $1  and invalid_client = $2"
 
 	FetchRefreshPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1 and invalid_client = $2 and to_be_refreshed = $3"
 
@@ -374,15 +374,6 @@ const (
 	) VALUES `
 
 	UpdatePendingJourneyDetails = `ON CONFLICT (client_code, provider) DO UPDATE SET
-    pending = EXCLUDED.pending,
-    payment_pending = EXCLUDED.payment_pending,
-    kyc_pending = EXCLUDED.kyc_pending,
-	updated_by = EXCLUDED.updated_by,
-    updated_at =current_timestamp,
-	invalid_client = EXCLUDED.invalid_client,
-	api_error = EXCLUDED.api_error;`
-
-	UpdatePendingJourneyDetailsTest = `ON CONFLICT (client_code, provider) DO UPDATE SET
     pending = EXCLUDED.pending,
     payment_pending = EXCLUDED.payment_pending,
     kyc_pending = EXCLUDED.kyc_pending,

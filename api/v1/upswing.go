@@ -24,6 +24,18 @@ func DefaultUpswingController() UpswingController {
 	return UpswingController{upswing: factory.GetUpSwingExternalService()}
 }
 
+// @Summary      Get portfolio and Pending journey
+// @Description  Call upswing portfolio API and Pending journey for given Client code
+// @version 1.0
+// @Tags         upswing
+// @Produce      json
+// @Param Authorization header string true "authorization token"
+// @Param X-Request-Id header string true "unique request id"
+// @Param X-Source header string false "source"
+// @Success      200  {object}  model.APIResponse{data=model.CombinedResponse}
+// @Failure	     400  {object}  errors.ErrResponse
+// @Failure      500  {object}  errors.ErrResponse
+// @Router       /v1/upswing [GET]
 func (c *UpswingController) GetUpswing(gctx *gin.Context) {
 	var response model.CombinedResponse
 	ctx := context.Build(gctx)

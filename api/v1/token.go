@@ -50,7 +50,7 @@ func (c *TokenController) GetToken(gctx *gin.Context) {
 	}
 
 	if provider == constants.UpSwingProvider {
-		response, err := c.upswing.GetNetWorthData(ctx, clientCode)
+		response, err := c.upswing.DoPCIRegistration(ctx, clientCode)
 		if err != nil {
 			errors.Throw(gctx, err)
 			return

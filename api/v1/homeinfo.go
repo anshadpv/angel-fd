@@ -23,6 +23,17 @@ func DefaultHomeInfoController() HomeInfoController {
 	return HomeInfoController{HomeInfoService: service.DefaultHomeInfoService()}
 }
 
+// @Summary      Get HomeInfo
+// @Description  Get all data pertaining to home page
+// @version 1.0
+// @Tags         HomeInfo
+// @Produce      json
+// @Param Authorization header string true "authorization token"
+// @Param X-Request-Id header string true "unique request id"
+// @Success      200  {object}  model.APIResponse{data=model.HomeInfo}
+// @Failure	     400  {object}  errors.ErrResponse
+// @Failure      500  {object}  errors.ErrResponse
+// @Router       /v1/homeInfo [GET]
 func (c *HomeInfoController) GetHomeInfopage(gctx *gin.Context) {
 	ctx := context.Build(gctx)
 	clientCode := context.Get(ctx).UserID

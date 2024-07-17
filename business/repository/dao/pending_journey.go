@@ -89,7 +89,7 @@ func (p *pendingJourneyDAOImpl) BatchUpdatePendingJourney(ctx context.Context, p
 	}
 
 	queryBuilder.WriteString(strings.Join(valueStrings, ", "))
-	queryBuilder.WriteString(UpdatePendingJourneyDetailsTest)
+	queryBuilder.WriteString(UpdatePendingJourneyDetails)
 	query := queryBuilder.String()
 
 	// Execute the batch update

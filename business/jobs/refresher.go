@@ -26,16 +26,16 @@ type PendingJourneyUpdaterTest interface {
 }
 
 type pendingJourneyJobTest struct {
-	upswing           external.UpSwing
-	pendingJourneyDao dao.PendingJourneyDAO
+	upswing               external.UpSwing
+	pendingJourneyDaoTest dao.PendingJourneyDAOTest
 }
 
-func DefaultpendingJourneyJobTestTest() cron.Job {
-	return &pendingJourneyJobTest{upswing: factory.GetUpSwingExternalService(), pendingJourneyDao: factory.GetPendingJourneyDAO()}
+func DefaultpendingJourneyJobTest() cron.Job {
+	return &pendingJourneyJobTest{upswing: factory.GetUpSwingExternalService(), pendingJourneyDaoTest: factory.GetPendingJourneyDAOTest()}
 }
 
 func DefaultPendingJourneyUpdaterTest() PendingJourneyUpdaterTest {
-	return &pendingJourneyJobTest{upswing: factory.GetUpSwingExternalService(), pendingJourneyDao: factory.GetPendingJourneyDAO()}
+	return &pendingJourneyJobTest{upswing: factory.GetUpSwingExternalService(), pendingJourneyDaoTest: factory.GetPendingJourneyDAOTest()}
 }
 
 func (p *pendingJourneyJobTest) Run() {
@@ -62,7 +62,7 @@ func (p *pendingJourneyJobTest) DoJobTest(ctx c.Context, refresher string) {
 
 func (p *pendingJourneyJobTest) executeTest(ctx c.Context, instantRefresh bool) {
 	provider := getPendingJourneyUpdateProvider(ctx)
-	clientList, err := p.pendingJourneyDao.FetchClientList(ctx, provider, instantRefresh)
+	clientList, err := p.pendingJourneyDaoTest.FetchClientListTest(ctx, provider, instantRefresh)
 	if err != nil {
 		log.Error(ctx).Err(err).Stack().Msg("fetching client list for pending journey job failed")
 		return
@@ -108,7 +108,7 @@ func (p *pendingJourneyJobTest) executeTest(ctx c.Context, instantRefresh bool) 
 		pendingJourneyEntities = append(pendingJourneyEntities, pendingJourneyEntity)
 
 		if len(pendingJourneyEntities) >= int(batchSize) {
-			err = p.pendingJourneyDao.BatchUpdatePendingJourney(ctx, pendingJourneyEntities)
+			err = p.pendingJourneyDaoTest.BatchUpdatePendingJourneyTest(ctx, pendingJourneyEntities)
 			if err != nil {
 				log.Error(ctx).Err(err).Stack().Msg("batch updating pending journey failed")
 				return
@@ -118,7 +118,7 @@ func (p *pendingJourneyJobTest) executeTest(ctx c.Context, instantRefresh bool) 
 	}
 
 	if len(pendingJourneyEntities) > 0 {
-		err = p.pendingJourneyDao.BatchUpdatePendingJourney(ctx, pendingJourneyEntities)
+		err = p.pendingJourneyDaoTest.BatchUpdatePendingJourneyTest(ctx, pendingJourneyEntities)
 		if err != nil {
 			log.Error(ctx).Err(err).Stack().Msg("batch updating pending journey failed")
 			return
@@ -126,13 +126,13 @@ func (p *pendingJourneyJobTest) executeTest(ctx c.Context, instantRefresh bool) 
 	}
 
 	if instantRefresh {
-		err := p.pendingJourneyDao.UpdateRefreshedPendingJourneyClientList(ctx, provider, clientList)
+		err := p.pendingJourneyDaoTest.UpdateRefreshedPendingJourneyClientListTest(ctx, provider, clientList)
 		if err != nil {
 			log.Error(ctx).Err(err).Stack().Msg("error while update refreshed pending_journey client list")
 			return
 		}
 	} else {
-		err := p.pendingJourneyDao.CleanStaleRecords(ctx)
+		err := p.pendingJourneyDaoTest.CleanStaleRecordsTest(ctx)
 		if err != nil {
 			log.Error(ctx).Err(err).Stack().Msg("error while cleaning up stale pending_journey records")
 			return
