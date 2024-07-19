@@ -29,6 +29,7 @@ func (service *fsiDetailServiceImpl) GetFsiDetails(ctx context.Context, fsiDetai
 		return responseMap, err
 	}
 
+	//mapping all records having the same fsi
 	fsiDetailsMap := make(map[string][]model.FsiStruct)
 	for _, details := range fsiDetailsPlan {
 		for _, detail := range details.Plans {
@@ -50,6 +51,5 @@ func (service *fsiDetailServiceImpl) GetFsiDetails(ctx context.Context, fsiDetai
 			}
 		}
 	}
-
 	return responseMap, nil
 }

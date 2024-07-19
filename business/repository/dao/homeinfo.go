@@ -14,7 +14,7 @@ import (
 
 type HomeInfoDAO interface {
 	FetchAllFDDetails(ctx context.Context) ([]model.Plan, error)
-	FetchMostBoughtDetails(ctx context.Context) ([]model.Plan, error)
+	FetchMostBoughtDetails(ctx context.Context) ([]model.PlanTest, error)
 	FetchPendingJourneyDetails(ctx context.Context, clientCode string, provider string) (*entity.PendingJourneyEntity, error)
 	FetchFAQDetails(ctx context.Context, tag string) (json.RawMessage, error)
 }
@@ -30,38 +30,7 @@ func DefaultHomeInfoDAO() HomeInfoDAO {
 func (d *homeInfoDAOImpl) FetchAllFDDetails(ctx context.Context) ([]model.Plan, error) {
 	var allFDs []model.Plan
 
-	rows, err := d.db.QueryContext(ctx, FetchFDHighIR)
-	if err != nil && err != sql.ErrNoRows {
-		return allFDs, fmt.Errorf("%s%w", "Error while fetching All FD details: ", err)
-	}
-
-	defer rows.Close()
-	for rows.Next() {
-		var PlanDetail model.Plan
-		var isMostBought bool
-		err := rows.Scan(
-			&PlanDetail.Fsi,
-			&PlanDetail.Name,
-			&PlanDetail.Type,
-			&PlanDetail.TenureYears,
-			&PlanDetail.TenureMonths,
-			&PlanDetail.TenureDays,
-			&PlanDetail.InterestRate,
-			&PlanDetail.LockinMonths,
-			&PlanDetail.WomenBenefit,
-			&PlanDetail.SeniorCitizen,
-			&PlanDetail.ImageURL,
-			&isMostBought,
-			&PlanDetail.Description,
-			&PlanDetail.InsuredAmount,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("%s%w", "Error while fetching All FD details: ", err)
-		}
-		allFDs = append(allFDs, PlanDetail)
-	}
-
-	rows, err = d.db.QueryContext(ctx, FetchFDMinIR)
+	rows, err := d.db.QueryContext(ctx, FetchFDTest)
 	if err != nil && err != sql.ErrNoRows {
 		return allFDs, fmt.Errorf("%s%w", "Error while fetching All FD details: ", err)
 	}
@@ -95,29 +64,24 @@ func (d *homeInfoDAOImpl) FetchAllFDDetails(ctx context.Context) ([]model.Plan, 
 	return allFDs, nil
 }
 
-func (d *homeInfoDAOImpl) FetchMostBoughtDetails(ctx context.Context) ([]model.Plan, error) {
-	var mostBoughtPlans []model.Plan
+func (d *homeInfoDAOImpl) FetchMostBoughtDetails(ctx context.Context) ([]model.PlanTest, error) {
+	var mostBoughtPlans []model.PlanTest
 
-	rows, err := d.db.QueryContext(ctx, FetchMostBoughtPlanDetails)
+	rows, err := d.db.QueryContext(ctx, FetchMostBoughtPlanDetailsTest)
 	if err != nil && err != sql.ErrNoRows {
 		return mostBoughtPlans, fmt.Errorf("%s%w", "Error while fetching Most bought FD details: ", err)
 	}
 
 	defer rows.Close()
 	for rows.Next() {
-		var PlanDetail model.Plan
+		var PlanDetail model.PlanTest
 
 		err := rows.Scan(
 			&PlanDetail.Fsi,
 			&PlanDetail.Name,
 			&PlanDetail.Type,
-			&PlanDetail.TenureYears,
-			&PlanDetail.TenureMonths,
-			&PlanDetail.TenureDays,
 			&PlanDetail.InterestRate,
 			&PlanDetail.LockinMonths,
-			&PlanDetail.WomenBenefit,
-			&PlanDetail.SeniorCitizen,
 			&PlanDetail.ImageURL,
 			&PlanDetail.Description,
 			&PlanDetail.InsuredAmount,

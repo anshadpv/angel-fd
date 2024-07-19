@@ -50,7 +50,7 @@ const (
 	
 `
 
-	FetchFDHighIR = `WITH RankedPlans AS (
+	FetchFDTest = `WITH RankedPlans AS (
 	SELECT
 		p.fsi AS "fsi",
 		b.name AS "name",
@@ -63,7 +63,7 @@ const (
 		COALESCE(p.women_benefit, 0) AS "womenBenefit",
 		COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
 		b.image_url AS "imageUrl",
-		p.is_mostbought as "isMostbought",
+		p.is_mostbought AS "isMostbought",
 		'' AS "description",
 		CASE
 			WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
@@ -75,74 +75,39 @@ const (
 	LEFT JOIN
 		banks b ON p.fsi = b.fsi
 	WHERE p.is_active = true
-)
-SELECT
-	"fsi",
-	"name",
-	"type",
-	"tenureYears",
-	"tenureMonths",
-	"tenureDays",
-	"interestRate",
-	"lockinMonths",
-	"womenBenefit",
-	"seniorCitizen",
-	"imageUrl",
-	"isMostbought",
-	"description",
-	"insuredAmount"
-FROM
-	RankedPlans
-WHERE
-	"row_num" = 1;
-`
-	FetchFDMinIR = `WITH RankedPlans AS (
+),
+MinMaxRows AS (
 	SELECT
-		p.fsi AS "fsi",
-		b.name AS "name",
-		p.plan_type AS "type",
-		p.tenure_years AS "tenureYears",
-		p.tenure_months AS "tenureMonths",
-		p.tenure_days AS "tenureDays",
-		p.interest_rate AS "interestRate",
-		p.lockin_months AS "lockinMonths",
-		COALESCE(p.women_benefit, 0) AS "womenBenefit",
-		COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
-		b.image_url AS "imageUrl",
-		p.is_mostbought as "isMostbought",
-		'' AS "description",
-		CASE
-			WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
-			ELSE 0
-		END AS "insuredAmount",
-		ROW_NUMBER() OVER (PARTITION BY p.fsi ORDER BY p.interest_rate ASC) AS "row_num"
+		"fsi",
+		MIN("row_num") AS min_row_num,
+		MAX("row_num") AS max_row_num
 	FROM
-		plans p
-	LEFT JOIN
-		banks b ON p.fsi = b.fsi
-	WHERE p.is_active = true
+		RankedPlans
+	GROUP BY
+		"fsi"
 )
 SELECT
-	"fsi",
-	"name",
-	"type",
-	"tenureYears",
-	"tenureMonths",
-	"tenureDays",
-	"interestRate",
-	"lockinMonths",
-	"womenBenefit",
-	"seniorCitizen",
-	"imageUrl",
-	"isMostbought",
-	"description",
-	"insuredAmount"
+	rp."fsi",
+	rp."name",
+	rp."type",
+	rp."tenureYears",
+	rp."tenureMonths",
+	rp."tenureDays",
+	rp."interestRate",
+	rp."lockinMonths",
+	rp."womenBenefit",
+	rp."seniorCitizen",
+	rp."imageUrl",
+	rp."isMostbought",
+	rp."description",
+	rp."insuredAmount"
 FROM
-	RankedPlans
+	RankedPlans rp
+JOIN
+	MinMaxRows mmr ON rp."fsi" = mmr."fsi"
 WHERE
-	"row_num" = 1;
+	rp."row_num" IN (mmr.min_row_num, mmr.max_row_num);`
 
-`
 	BaseFetchPlanQuery = `SELECT
 	p.fsi AS "fsi",
 	b.name AS "name",
@@ -154,6 +119,25 @@ WHERE
 	p.lockin_months AS "lockinMonths",
 	COALESCE(p.women_benefit, 0) AS "womenBenefit",
 	COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+	b.image_url AS "imageUrl",
+	'' AS "description",
+	CASE
+		WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+		ELSE 0
+	END AS "insuredAmount"
+	FROM
+	plans p
+	LEFT JOIN
+	banks b ON p.fsi = b.fsi
+	WHERE
+	p.is_active = true`
+
+	BaseFetchPlanQueryTest = `SELECT
+	p.fsi AS "fsi",
+	b.name AS "name",
+	p.plan_type AS "type",
+	p.interest_rate AS "interestRate",
+	p.lockin_months AS "lockinMonths",
 	b.image_url AS "imageUrl",
 	'' AS "description",
 	CASE
@@ -231,6 +215,8 @@ WHERE
 
 	FetchMostBoughtPlanDetails = BaseFetchPlanQuery + " AND p.is_mostbought = true"
 
+	FetchMostBoughtPlanDetailsTest = BaseFetchPlanQueryTest + " AND p.is_mostbought = true"
+
 	FetchPendingJourneyDetails = `select pending, payment_pending, kyc_pending from pending_journey`
 
 	FetchPendingJourneyDetailsTest = `select pending, payment_pending, kyc_pending from pending_journey_test`
@@ -295,7 +281,7 @@ ORDER BY
     b.fsi AS "fsi",
     b.name AS "name",
 	p.plan_type AS "type",
-    MAX(p.interest_rate) AS "interestRate",
+    p.interest_rate AS "interestRate",
 	p.lockin_months AS "lockinMonths",
 	COALESCE(p.women_benefit, 0) AS "womenBenefit",
 	COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
@@ -314,7 +300,32 @@ ORDER BY
 	WHERE 
     	p.is_active = TRUE AND p.fsi IN (%s)
 	GROUP BY 
-		p.fsi, b.fsi, p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, p.is_insured`
+		p.fsi, b.fsi, p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, p.is_insured, p.interest_rate`
+
+	FsiDetailsQueryTest = `SELECT 
+		b.fsi AS "fsi",
+		b.name AS "name",
+		p.plan_type AS "type",
+		p.interest_rate AS "interestRate",
+		p.lockin_months AS "lockinMonths",
+		COALESCE(p.women_benefit, 0) AS "womenBenefit",
+		COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+		b.image_url AS "imageUrl",
+		b.insurance_description AS "description",
+		CASE
+			WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+			ELSE 0
+		END AS "insuredAmount",
+		b.about,
+		b.calculator
+		FROM 
+			plans AS p
+		JOIN
+			banks AS b ON p.fsi = b.fsi
+		WHERE 
+			p.is_active = TRUE AND p.fsi = $1
+		GROUP BY 
+			p.fsi, b.fsi, p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, p.is_insured, p.interest_rate`
 )
 
 // portfolio

@@ -38,10 +38,17 @@ func (c *FsiDetailsController) GetFsiDetails(gctx *gin.Context) {
 	log.Debug(ctx).Msgf("ClientCode: %s ", clientCode)
 
 	queryParams := gctx.Request.URL.Query()
+	fmt.Println("THIS IS THE QUERY PARAMS")
+
+	fmt.Println(queryParams)
 	if len(queryParams) == 0 {
 		errors.Throw(gctx, goerr.New(nil, http.StatusBadRequest, "No query parameters provided"))
 		return
+	} else if len(queryParams) > 4 {
+		errors.Throw(gctx, goerr.New(nil, http.StatusBadRequest, "Query parameters limit exceeded"))
+		return
 	}
+
 	var fsiDetailsKeys []string
 	var fsiDetailsValues []string
 
@@ -51,13 +58,16 @@ func (c *FsiDetailsController) GetFsiDetails(gctx *gin.Context) {
 			fsiDetailsValues = append(fsiDetailsValues, v)
 		}
 	}
+	fmt.Println(fsiDetailsKeys)
+
+	fmt.Println(fsiDetailsValues)
 
 	response, err := c.FsiDetailService.GetFsiDetails(ctx, fsiDetailsKeys, fsiDetailsValues)
 	if err != nil {
-		errMsg := fmt.Sprintf("unable to get compare fsi details due to %v", err)
+		errMsg := fmt.Sprintf("unable to get fsi details due to %v", err)
 		errors.Throw(gctx, goerr.New(err, http.StatusInternalServerError, errMsg))
 		return
 	}
-	log.Trace(ctx).Msgf("Compare FSI Details Response: %+v", response)
+	log.Trace(ctx).Msgf("FSI Details Response: %+v", response)
 	gctx.JSON(http.StatusOK, model.APIResponse{Data: response})
 }
