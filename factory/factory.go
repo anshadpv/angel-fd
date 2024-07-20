@@ -23,6 +23,7 @@ func Init(ctx context.Context) {
 	//dao
 	portfolioDAO = dao.DefaultPortfolioDAO()
 	pendingJourneyDAO = dao.DefaultPendingJourneyDAO()
+	pendingJourneyDAOTest = dao.DefaultPendingJourneyDAOTest()
 }
 
 func GetUpSwingExternalService() external.UpSwing {

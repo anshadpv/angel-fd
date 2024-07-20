@@ -65,11 +65,21 @@ func (c *UpswingController) GetUpswing(gctx *gin.Context) {
 		return
 	}
 
+	pendingJourneyResponseTest := ConvertToPendingJourneyResponseTest(*pendingJourneyResponse)
+
 	response = model.CombinedResponse{
 		NetWorthData:   *netWorthResponse,
-		PendingJourney: *pendingJourneyResponse,
+		PendingJourney: pendingJourneyResponseTest,
 	}
 
 	log.Trace(ctx).Msgf("Response: %+v", response)
 	gctx.JSON(http.StatusOK, model.APIResponse{Data: response})
+}
+
+func ConvertToPendingJourneyResponseTest(pjr model.PendingJourneyResponse) model.PendingJourneyResponseTest {
+	return model.PendingJourneyResponseTest{
+		JourneyPending:          pjr.JourneyPending,
+		JourneyPendingOnPayment: pjr.JourneyPendingOnPayment,
+		JourneyPendingOnVkyc:    pjr.JourneyPendingOnVkyc,
+	}
 }

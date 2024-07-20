@@ -62,6 +62,7 @@ func (p *pendingJourneyJobTest) DoJobTest(ctx c.Context, refresher string) {
 
 func (p *pendingJourneyJobTest) executeTest(ctx c.Context, instantRefresh bool) {
 	provider := getPendingJourneyUpdateProvider(ctx)
+
 	clientList, err := p.pendingJourneyDaoTest.FetchClientListTest(ctx, provider, instantRefresh)
 	if err != nil {
 		log.Error(ctx).Err(err).Stack().Msg("fetching client list for pending journey job failed")

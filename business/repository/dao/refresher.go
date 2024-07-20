@@ -19,15 +19,15 @@ type PendingJourneyDAOTest interface {
 	CleanStaleRecordsTest(ctx context.Context) error
 }
 
-type pendingJourneyDAOTestImpl struct {
+type pendingJourneyDAOImplTest struct {
 	db *sql.DB
 }
 
 func DefaultPendingJourneyDAOTest() PendingJourneyDAOTest {
-	return &pendingJourneyDAOTestImpl{db: database.GetDBPool(true)}
+	return &pendingJourneyDAOImplTest{db: database.GetDBPool(true)}
 }
 
-func (p *pendingJourneyDAOTestImpl) FetchPendingJourneyDetailsTest(ctx context.Context, clientCode string, provider string) (*entity.PendingJourneyEntity, error) {
+func (p *pendingJourneyDAOImplTest) FetchPendingJourneyDetailsTest(ctx context.Context, clientCode string, provider string) (*entity.PendingJourneyEntity, error) {
 	var entity entity.PendingJourneyEntity
 	err := p.db.QueryRowContext(ctx, FetchPendingForClient, clientCode, provider).Scan(&entity.Pending, &entity.Payment, &entity.KYC)
 	if err != nil {
@@ -40,7 +40,7 @@ func (p *pendingJourneyDAOTestImpl) FetchPendingJourneyDetailsTest(ctx context.C
 	return &entity, nil
 }
 
-func (p *pendingJourneyDAOTestImpl) FetchClientListTest(ctx context.Context, provider string, instantRefresh bool) ([]string, error) {
+func (p *pendingJourneyDAOImplTest) FetchClientListTest(ctx context.Context, provider string, instantRefresh bool) ([]string, error) {
 	var clientList []string
 	var rows *sql.Rows
 	var err error
@@ -66,10 +66,25 @@ func (p *pendingJourneyDAOTestImpl) FetchClientListTest(ctx context.Context, pro
 		}
 		clientList = append(clientList, clientCode)
 	}
+
+	if !instantRefresh {
+		fsiPlaceholders := make([]string, len(clientList))
+
+		for i, _ := range clientList {
+			fsiPlaceholders[i] = fmt.Sprintf("$%d", i+1)
+		}
+
+		quotedPlaceholderString := strings.Join(fsiPlaceholders, ", ")
+
+		query := fmt.Sprintf(FetchPendingJourneyWithPending, quotedPlaceholderString)
+
+		rows, err = p.db.QueryContext(ctx, query, clientList)
+	}
+
 	return clientList, nil
 }
 
-func (p *pendingJourneyDAOTestImpl) BatchUpdatePendingJourneyTest(ctx context.Context, pendingJourneyEntities []entity.PendingJourneyEntity) error {
+func (p *pendingJourneyDAOImplTest) BatchUpdatePendingJourneyTest(ctx context.Context, pendingJourneyEntities []entity.PendingJourneyEntity) error {
 	if len(pendingJourneyEntities) == 0 {
 		return nil
 	}
@@ -101,7 +116,7 @@ func (p *pendingJourneyDAOTestImpl) BatchUpdatePendingJourneyTest(ctx context.Co
 	return nil
 }
 
-func (p *pendingJourneyDAOTestImpl) UpdateRefreshedPendingJourneyClientListTest(ctx context.Context, provider string, clientList []string) error {
+func (p *pendingJourneyDAOImplTest) UpdateRefreshedPendingJourneyClientListTest(ctx context.Context, provider string, clientList []string) error {
 	if len(clientList) == 0 {
 		return nil
 	}
@@ -126,7 +141,7 @@ func (p *pendingJourneyDAOTestImpl) UpdateRefreshedPendingJourneyClientListTest(
 	return nil
 }
 
-func (p *pendingJourneyDAOTestImpl) CleanStaleRecordsTest(ctx context.Context) error {
+func (p *pendingJourneyDAOImplTest) CleanStaleRecordsTest(ctx context.Context) error {
 
 	_, err := p.db.ExecContext(ctx, CleanStalePendingJourneyRecordsTest)
 

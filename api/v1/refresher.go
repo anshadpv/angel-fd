@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+
 	"github.com/angel-one/fd-core/business/service"
 	"github.com/angel-one/fd-core/commons/context"
 	"github.com/angel-one/fd-core/commons/log"
@@ -22,5 +24,6 @@ func (j *RefresherController) GetPendingJourneyRefresher(gctx *gin.Context) {
 	clientCode := context.Get(ctx).UserID
 	refresher := gctx.Param(constants.Refresher)
 	log.Debug(ctx).Msgf("ClientCode: %s; Refresher: %s ", clientCode, refresher)
+	fmt.Println("WE ARE CALLING INVOKE PEDNIGN JRNY RFRSHR")
 	j.RefresherService.InvokePendingJourneyRefresher(ctx, refresher)
 }
