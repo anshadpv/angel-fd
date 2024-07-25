@@ -64,7 +64,6 @@ func (d *compareDAOImpl) FetchCompareFsiDetails(ctx context.Context, fsis []stri
 	query := fmt.Sprintf(CompareFsiQuery, quotedPlaceholderString)
 
 	rows, err := d.db.QueryContext(ctx, query, placeholderValues...)
-	fmt.Println(rows)
 	if err != nil && err != sql.ErrNoRows {
 		return compareFSIDBDetails, fmt.Errorf("%s%w", "Error while fetching compare FSI Details: ", err)
 	}

@@ -58,9 +58,6 @@ func (c *FsiDetailsController) GetFsiDetails(gctx *gin.Context) {
 			fsiDetailsValues = append(fsiDetailsValues, v)
 		}
 	}
-	fmt.Println(fsiDetailsKeys)
-
-	fmt.Println(fsiDetailsValues)
 
 	response, err := c.FsiDetailService.GetFsiDetails(ctx, fsiDetailsKeys, fsiDetailsValues)
 	if err != nil {

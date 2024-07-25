@@ -323,9 +323,7 @@ ORDER BY
 		JOIN
 			banks AS b ON p.fsi = b.fsi
 		WHERE 
-			p.is_active = TRUE AND p.fsi = $1
-		GROUP BY 
-			p.fsi, b.fsi, p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, p.is_insured, p.interest_rate`
+			p.is_active = TRUE AND p.fsi IN (%s)`
 )
 
 // portfolio
@@ -362,9 +360,9 @@ const (
 const (
 	FetchPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1  and invalid_client = $2"
 
-	FetchPendingJourneyClientListByProviderTest = "select client_code from pending_journey_test where provider = $1  and invalid_client = $2"
+	FetchPendingJourneyClientListByProviderTest = "select client_code from pending_journey_test where provider = $1  and invalid_client = $2 and pending=true"
 
-	FetchPendingJourneyWithPending = "select client_code, provider, pending, payment_pending, kyc_pending, created_at, updated_at, created_by, updated_by, to_be_refreshed, invalid_client from pending_journey_test where pending IN (%s)"
+	FetchPendingJourneyWithPending = "select client_code, provider, pending, payment_pending, kyc_pending, created_at, updated_at, created_by, updated_by, to_be_refreshed, invalid_client from pending_journey_test where pending=true and p.fsi IN (%s)"
 
 	FetchRefreshPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1 and invalid_client = $2 and to_be_refreshed = $3"
 

@@ -67,19 +67,19 @@ func (p *pendingJourneyDAOImplTest) FetchClientListTest(ctx context.Context, pro
 		clientList = append(clientList, clientCode)
 	}
 
-	if !instantRefresh {
-		fsiPlaceholders := make([]string, len(clientList))
+	// if !instantRefresh {
+	// 	fsiPlaceholders := make([]string, len(clientList))
 
-		for i, _ := range clientList {
-			fsiPlaceholders[i] = fmt.Sprintf("$%d", i+1)
-		}
+	// 	for i, _ := range clientList {
+	// 		fsiPlaceholders[i] = fmt.Sprintf("$%d", i+1)
+	// 	}
 
-		quotedPlaceholderString := strings.Join(fsiPlaceholders, ", ")
+	// 	quotedPlaceholderString := strings.Join(fsiPlaceholders, ", ")
 
-		query := fmt.Sprintf(FetchPendingJourneyWithPending, quotedPlaceholderString)
+	// 	query := fmt.Sprintf(FetchPendingJourneyWithPending, quotedPlaceholderString)
 
-		rows, err = p.db.QueryContext(ctx, query, clientList)
-	}
+	// 	rows, err = p.db.QueryContext(ctx, query, clientList)
+	// }
 
 	return clientList, nil
 }
