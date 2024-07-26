@@ -17,5 +17,6 @@ func initPortfolioV1Group(v1Group *gin.RouterGroup) {
 	{
 		portfolio.GET("", portfolioController.GetPortfolio)
 		portfolio.GET(constants.PathParam+constants.Provider+constants.PathSplitter+constants.Networth, portfolioController.GetNetworth)
+		portfolio.GET(constants.Details, portfolioController.GetPortfolioDetails)
 	}
 }

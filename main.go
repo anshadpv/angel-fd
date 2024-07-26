@@ -6,6 +6,7 @@ import (
 
 	"github.com/angel-one/fd-core/api/routes"
 	"github.com/angel-one/fd-core/business/jobs"
+	"github.com/angel-one/fd-core/commons/cache"
 	"github.com/angel-one/fd-core/commons/config"
 	"github.com/angel-one/fd-core/commons/context"
 	"github.com/angel-one/fd-core/commons/database"
@@ -37,7 +38,7 @@ func init() {
 // config initialization
 func init() {
 	var err error
-	configNames := []string{constants.ApplicationConfig, constants.LoggerConfig, constants.DatabaseConfig, constants.HTTPClientConfig}
+	configNames := []string{constants.ApplicationConfig, constants.LoggerConfig, constants.DatabaseConfig, constants.HTTPClientConfig, constants.RedisConfig}
 	if flags.Mode() == "test" {
 		err = config.InitTestMode(fmt.Sprintf("%s/%s", flags.BaseConfigPath(), flags.Env()), configNames...)
 	} else {
@@ -75,6 +76,15 @@ func init() {
 		log.Fatal(ctx).Err(err).Stack().Msg("failed to initialize database")
 	}
 	log.Info(ctx).Msg("database initialized")
+}
+
+// performs redis initialization
+func init() {
+	err := cache.Init(ctx, config.Default(), constants.RedisConfig)
+	if err != nil {
+		log.Fatal(ctx).Err(err).Stack().Msg("failed to initialize redis cluster cache client")
+	}
+	log.Info(ctx).Msg("redis cluster initialized")
 }
 
 // perform http clients

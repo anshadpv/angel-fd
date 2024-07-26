@@ -11,6 +11,7 @@ import (
 
 type PortfolioService interface {
 	GetPortfolio(ctx context.Context, provider string, clientCode string) (*model.Portfolio, error)
+	GetPortfolioFromRedis(ctx context.Context, provider string, clientCode string) (model.PortfolioDetails, error)
 }
 
 type portfolioServiceImpl struct {
@@ -32,4 +33,15 @@ func (p *portfolioServiceImpl) GetPortfolio(ctx context.Context, clientCode stri
 	}
 	portfolio := model.Portfolio{TotalActiveDeposits: entity.TotalActiveDeposits, InvestedValue: entity.InvestedValue, CurrentValue: entity.CurrentValue, InterestEarned: entity.InterestEarned, ReturnsValue: entity.ReturnsValue, ReturnsPercentage: entity.ReturnsPercentage}
 	return &portfolio, nil
+}
+
+func (p *portfolioServiceImpl) GetPortfolioFromRedis(ctx context.Context, clientCode string, provider string) (model.PortfolioDetails, error) {
+	var portfolioDetails model.PortfolioDetails
+	portfolio, err := p.portfolioDAO.FetchPortfolioFromRedis(ctx, clientCode, provider)
+	if err != nil {
+		return portfolioDetails, goerr.New(err, "service: GetPortfolioFromRedis by client failed")
+	}
+
+	portfolioDetails.Portfolio = portfolio
+	return portfolioDetails, nil
 }

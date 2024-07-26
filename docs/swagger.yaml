@@ -12,13 +12,6 @@ definitions:
       message:
         type: string
     type: object
-  model.CombinedResponse:
-    properties:
-      netWorthData:
-        $ref: '#/definitions/model.NetWorthResponse'
-      pendingJourney:
-        $ref: '#/definitions/model.PendingJourneyResponse'
-    type: object
   model.CompareFSIDetails:
     properties:
       bankAccount:
@@ -67,29 +60,6 @@ definitions:
         example: success
         type: string
     type: object
-  model.FsiDetailPlans:
-    properties:
-      description:
-        type: string
-      fsi:
-        type: string
-      imageUrl:
-        type: string
-      insuredAmount:
-        type: integer
-      interestRate:
-        type: number
-      lockinMonths:
-        type: integer
-      name:
-        type: string
-      seniorCitizen:
-        type: number
-      type:
-        type: string
-      womenBenefit:
-        type: number
-    type: object
   model.FsiDetails:
     properties:
       fsi:
@@ -133,38 +103,6 @@ definitions:
           $ref: '#/definitions/model.Plan'
         type: array
     type: object
-  model.FsiStruct:
-    properties:
-      about:
-        additionalProperties: true
-        type: object
-      calculator: {}
-      faqs:
-        items:
-          $ref: '#/definitions/model.FAQ'
-        type: array
-      plans:
-        items:
-          $ref: '#/definitions/model.FsiDetailPlans'
-        type: array
-    type: object
-  model.HomeInfo:
-    properties:
-      allFDs:
-        items:
-          $ref: '#/definitions/model.Plan'
-        type: array
-      faqs:
-        items:
-          $ref: '#/definitions/model.FAQ'
-        type: array
-      journey:
-        $ref: '#/definitions/model.Journey'
-      mostBought:
-        items:
-          $ref: '#/definitions/model.Plan'
-        type: array
-    type: object
   model.Homepage:
     properties:
       allFDs:
@@ -202,15 +140,6 @@ definitions:
         type: string
       ici:
         type: string
-    type: object
-  model.PendingJourneyResponse:
-    properties:
-      journeyPending:
-        type: boolean
-      journeyPendingOnPayment:
-        type: boolean
-      journeyPendingOnVkyc:
-        type: boolean
     type: object
   model.PendingState:
     properties:
@@ -254,6 +183,26 @@ definitions:
         items:
           $ref: '#/definitions/model.Plan'
         type: array
+    type: object
+  model.Portfolio:
+    properties:
+      currentValue:
+        type: number
+      interestEarned:
+        type: number
+      investedValue:
+        type: number
+      returnsPercentage:
+        type: number
+      returnsValue:
+        type: number
+      totalActiveDeposits:
+        type: integer
+    type: object
+  model.PortfolioDetails:
+    properties:
+      portfolio:
+        $ref: '#/definitions/model.Portfolio'
     type: object
   model.TotalInterestEarned:
     properties:
@@ -420,43 +369,6 @@ paths:
       summary: Get FAQs
       tags:
       - FAQ
-  /v1/fsi/details:
-    get:
-      description: Fetches all the details of FSI's that are eligible for comparision
-      parameters:
-      - description: authorization token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: unique request id
-        in: header
-        name: X-Request-Id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/model.APIResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/model.FsiStruct'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrResponse'
-      summary: Get complete FSI's details
-      tags:
-      - Fsi_Details
   /v1/home:
     get:
       description: Get all data pertaining to home page
@@ -494,43 +406,6 @@ paths:
       summary: Get Homepage data
       tags:
       - Home
-  /v1/homeInfo:
-    get:
-      description: Get all data pertaining to home page
-      parameters:
-      - description: authorization token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: unique request id
-        in: header
-        name: X-Request-Id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/model.APIResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/model.HomeInfo'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrResponse'
-      summary: Get HomeInfo
-      tags:
-      - HomeInfo
   /v1/plans:
     get:
       description: Fetch all plan details across all banks/FSIs
@@ -647,6 +522,43 @@ paths:
       summary: Get Portfolio Summary
       tags:
       - Portfolio
+  /v1/portfolio/details:
+    get:
+      description: Get Portfolio Details from cache
+      parameters:
+      - description: authorization token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: unique request id
+        in: header
+        name: X-Request-Id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.PortfolioDetails'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrResponse'
+      summary: Get Portfolio Details from cache
+      tags:
+      - Portfolio
   /v1/token/{provider}:
     get:
       description: Get token from vendor for given clientCode
@@ -688,46 +600,4 @@ paths:
       summary: Get token from vendor
       tags:
       - Provider
-  /v1/upswing:
-    get:
-      description: Call upswing portfolio API and Pending journey for given Client
-        code
-      parameters:
-      - description: authorization token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: unique request id
-        in: header
-        name: X-Request-Id
-        required: true
-        type: string
-      - description: source
-        in: header
-        name: X-Source
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/model.APIResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/model.CombinedResponse'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ErrResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.ErrResponse'
-      summary: Get portfolio and Pending journey
-      tags:
-      - upswing
 swagger: "2.0"

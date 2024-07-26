@@ -1,0 +1,9 @@
+redis-config:
+  url: fd-core-authlogin-uat-rg1.8t9n2n.clustercfg.aps1.cache.amazonaws.com:6379
+  connections:
+    poolSize: 100
+    maxConn : 50
+    minIdleConn : 25
+    poolTimeoutInMilliSecond : 6000
+    readTimeoutInMilliSecond : 6000
+    redisWriteTimeoutInMilliSecond : 1000

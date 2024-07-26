@@ -16,6 +16,7 @@ type FsiPlans struct {
 	About                  map[string]interface{} `json:"about"`
 	Calculator             interface{}            `json:"calculator"`
 }
+
 type Plan struct {
 	Fsi           string  `json:"fsi"`
 	Name          string  `json:"name"`

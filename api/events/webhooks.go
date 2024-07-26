@@ -1,6 +1,7 @@
 package events
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/angel-one/fd-core/business/model"
@@ -28,7 +29,8 @@ func (c *WebhooksController) ReadUpSwingMessage(gctx *gin.Context) {
 		errors.Throw(gctx, goerr.New(nil, http.StatusForbidden, "invalid token"))
 		return
 	}
-	log.Debug(ctx).Msg("New upswing webhook event received")
+	body, _ := io.ReadAll(gctx.Request.Body)
+	log.Debug(ctx).Msgf("New upswing webhook event received. Raw Message: [%s]", (string(body)))
 
 	var request model.UpSwingWebhookEvent
 	if err := gctx.ShouldBind(&request); err != nil {

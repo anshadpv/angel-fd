@@ -8,6 +8,7 @@ const (
 	LoggerConfig      = "logger"
 	DatabaseConfig    = "database"
 	HTTPClientConfig  = "http-client"
+	RedisConfig       = "redis"
 )
 
 const (
@@ -111,4 +112,8 @@ const (
 const (
 	PendingJourneyUpdateBatchSize = "pendingJourneyUpdateBatchSize"
 	PendingJourneyProvider        = "pendingJourneyProvider"
+)
+
+const (
+	PortfolioRedisKey = "portfolioData"
 )

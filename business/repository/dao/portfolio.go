@@ -3,16 +3,21 @@ package dao
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strings"
 
+	"github.com/angel-one/fd-core/business/model"
 	"github.com/angel-one/fd-core/business/repository/entity"
+	"github.com/angel-one/fd-core/commons/cache"
 	"github.com/angel-one/fd-core/commons/database"
+	"github.com/angel-one/fd-core/constants"
 	"github.com/angel-one/goerr"
 )
 
 type PortfolioDAO interface {
 	FindByClient(ctx context.Context, clientCode string, provider string) (*entity.PortfolioEntity, error)
+	FetchPortfolioFromRedis(ctx context.Context, clientCode string, provider string) (model.Portfolio, error)
 	FetchClientList(ctx context.Context, provider string, instantRefresh bool) ([]string, error)
 	BatchUpdatePortfolio(ctx context.Context, portfolioUpdateEntities []entity.PortfolioEntity) error
 	UpdateRefreshedPortfolioClientList(ctx context.Context, provider string, clientList []string) error
@@ -135,4 +140,23 @@ func (p *portfolioDAOImpl) CleanStaleRecords(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (p *portfolioDAOImpl) FetchPortfolioFromRedis(ctx context.Context, clientCode string, provider string) (model.Portfolio, error) {
+	var portfolioData model.Portfolio
+	var err error
+
+	response, err := cache.GetRedisClient().GetMultipleHashStringMap(ctx, constants.PortfolioRedisKey)
+	if err != nil {
+		return portfolioData, goerr.New(err, fmt.Sprintf("dao failed: fetch portfolio details from redis failed for clientCode: %s", clientCode))
+	} else {
+		clientPortfolio := response[constants.PortfolioRedisKey][clientCode]
+
+		err = json.Unmarshal([]byte(clientPortfolio), &portfolioData)
+		if err != nil {
+			return portfolioData, fmt.Errorf("error while unmarshalling portfolio data fetched from redis for key: %s and clientcode: %s", constants.PortfolioRedisKey, clientCode)
+		}
+	}
+
+	return portfolioData, nil
 }

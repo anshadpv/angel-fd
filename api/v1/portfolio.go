@@ -94,3 +94,39 @@ func (p *PortfolioController) GetPortfolio(gctx *gin.Context) {
 	return
 
 }
+
+// @Summary      Get Portfolio Details from cache
+// @Description  Get Portfolio Details from cache
+// @version 1.0
+// @Tags         Portfolio
+// @Produce      json
+// @Param Authorization header string true "authorization token"
+// @Param X-Request-Id header string true "unique request id"
+// @Success      200  {object}  model.APIResponse{data=model.PortfolioDetails}
+// @Failure	     400  {object}  errors.ErrResponse
+// @Failure      500  {object}  errors.ErrResponse
+// @Router       /v1/portfolio/details [GET]
+func (p *PortfolioController) GetPortfolioDetails(gctx *gin.Context) {
+	ctx := context.Build(gctx)
+	clientCode := context.Get(ctx).UserID
+	provider := constants.UpSwingProvider //hardcode for now until we find another vendor
+	log.Info(ctx).Msgf("ClientCode: %s; Provider: %s", clientCode, provider)
+
+	if !slices.Contains(constants.KnownProviders, provider) {
+		msg := fmt.Sprintf("Provider %s not supported", provider)
+		errors.Throw(gctx, goerr.New(nil, http.StatusForbidden, msg))
+		return
+	}
+
+	response, err := p.portfolio.GetPortfolioFromRedis(ctx, clientCode, provider)
+	if err != nil {
+		errors.Throw(gctx, goerr.New(err, http.StatusInternalServerError, "unable to get portfolio data"))
+		return
+	}
+
+	log.Trace(ctx).Msgf("Portfolio Response from Redis: %+v", response)
+	gctx.JSON(http.StatusOK, model.APIResponse{Data: response})
+
+	return
+
+}

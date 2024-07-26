@@ -12,3 +12,7 @@ type Portfolio struct {
 	ReturnsValue        float64 `json:"returnsValue"`
 	ReturnsPercentage   float64 `json:"returnsPercentage"`
 }
+
+type PortfolioDetails struct {
+	Portfolio Portfolio `json:"portfolio"`
+}

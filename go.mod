@@ -4,6 +4,7 @@ go 1.21.3
 
 require (
 	github.com/angel-one/go-actuator v0.3.0
+	github.com/angel-one/go-cache-client v0.23.0
 	github.com/angel-one/go-config-client v0.11.0
 	github.com/angel-one/go-http-client v0.10.0
 	github.com/angel-one/go-utils v0.20.0
@@ -23,20 +24,15 @@ require (
 )
 
 require (
-	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/ClickHouse/clickhouse-go v1.5.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/appconfig v1.29.5 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
-	github.com/cloudflare/golz4 v0.0.0-20150217214814-ef862a3cdc58 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	github.com/denisenkom/go-mssqldb v0.12.3 // indirect
-	github.com/go-sql-driver/mysql v1.8.1 // indirect
-	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
-	github.com/golang-sql/sqlexp v0.1.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.22 // indirect
-	github.com/pressly/goose v2.7.0+incompatible // indirect
-	github.com/ziutek/mymysql v1.5.4 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.5 // indirect
+	github.com/redis/go-redis/v9 v9.3.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
 require (
@@ -94,9 +90,9 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect

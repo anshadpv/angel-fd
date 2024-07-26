@@ -75,11 +75,7 @@ const (
 	Jobs           = "/jobs"
 	Update         = "/update"
 	PendingJourney = "/pendingJourney"
-	Fsi            = "/fsi"
 	Details        = "/details"
-	HomeInfo       = "/homeInfo"
-	Upswing        = "/upswing"
-	Pending        = "/pending"
 )
 
 const (
