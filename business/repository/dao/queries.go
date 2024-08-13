@@ -49,6 +49,65 @@ const (
 		"row_num" = 1;
 	
 `
+
+	FetchFDTest = `WITH RankedPlans AS (
+	SELECT
+		p.fsi AS "fsi",
+		b.name AS "name",
+		p.plan_type AS "type",
+		p.tenure_years AS "tenureYears",
+		p.tenure_months AS "tenureMonths",
+		p.tenure_days AS "tenureDays",
+		p.interest_rate AS "interestRate",
+		p.lockin_months AS "lockinMonths",
+		COALESCE(p.women_benefit, 0) AS "womenBenefit",
+		COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+		b.image_url AS "imageUrl",
+		p.is_mostbought AS "isMostbought",
+		'' AS "description",
+		CASE
+			WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+			ELSE 0
+		END AS "insuredAmount",
+		ROW_NUMBER() OVER (PARTITION BY p.fsi ORDER BY p.interest_rate DESC) AS "row_num"
+	FROM
+		plans p
+	LEFT JOIN
+		banks b ON p.fsi = b.fsi
+	WHERE p.is_active = true
+),
+MinMaxRows AS (
+	SELECT
+		"fsi",
+		MIN("row_num") AS min_row_num,
+		MAX("row_num") AS max_row_num
+	FROM
+		RankedPlans
+	GROUP BY
+		"fsi"
+)
+SELECT
+	rp."fsi",
+	rp."name",
+	rp."type",
+	rp."tenureYears",
+	rp."tenureMonths",
+	rp."tenureDays",
+	rp."interestRate",
+	rp."lockinMonths",
+	rp."womenBenefit",
+	rp."seniorCitizen",
+	rp."imageUrl",
+	rp."isMostbought",
+	rp."description",
+	rp."insuredAmount"
+FROM
+	RankedPlans rp
+JOIN
+	MinMaxRows mmr ON rp."fsi" = mmr."fsi"
+WHERE
+	rp."row_num" IN (mmr.min_row_num, mmr.max_row_num);`
+
 	BaseFetchPlanQuery = `SELECT
 	p.fsi AS "fsi",
 	b.name AS "name",
@@ -60,6 +119,25 @@ const (
 	p.lockin_months AS "lockinMonths",
 	COALESCE(p.women_benefit, 0) AS "womenBenefit",
 	COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+	b.image_url AS "imageUrl",
+	'' AS "description",
+	CASE
+		WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+		ELSE 0
+	END AS "insuredAmount"
+	FROM
+	plans p
+	LEFT JOIN
+	banks b ON p.fsi = b.fsi
+	WHERE
+	p.is_active = true`
+
+	BaseFetchPlanQueryTest = `SELECT
+	p.fsi AS "fsi",
+	b.name AS "name",
+	p.plan_type AS "type",
+	p.interest_rate AS "interestRate",
+	p.lockin_months AS "lockinMonths",
 	b.image_url AS "imageUrl",
 	'' AS "description",
 	CASE
@@ -137,9 +215,13 @@ const (
 
 	FetchMostBoughtPlanDetails = BaseFetchPlanQuery + " AND p.is_mostbought = true"
 
+	FetchMostBoughtPlanDetailsTest = BaseFetchPlanQueryTest + " AND p.is_mostbought = true"
+
 	FetchPendingJourneyDetails = `select pending, payment_pending, kyc_pending from pending_journey`
 
-	FetchPendingForClient = FetchPendingJourneyDetails + ` where client_code = $1 and provider = $2`
+	FetchPendingJourneyDetailsTest = `select pending, payment_pending, kyc_pending from pending_journey_test`
+
+	FetchPendingForClient = FetchPendingJourneyDetailsTest + ` where client_code = $1 and provider = $2`
 
 	GetFAQsByTag = `select faq from faqs where tag=$1 and is_active=true`
 
@@ -194,6 +276,54 @@ GROUP BY
     b.fsi, b.name, p.tenure_years, p.tenure_months, p.tenure_days, b.min_investment_amount, p.is_insured, b.insurance_description
 ORDER BY 
     p.tenure_years;`
+
+	FsiDetailsQuery = `SELECT 
+    b.fsi AS "fsi",
+    b.name AS "name",
+	p.plan_type AS "type",
+    p.interest_rate AS "interestRate",
+	p.lockin_months AS "lockinMonths",
+	COALESCE(p.women_benefit, 0) AS "womenBenefit",
+	COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+	b.image_url AS "imageUrl",
+	b.insurance_description AS "description",
+	CASE
+		WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+		ELSE 0
+	END AS "insuredAmount",
+	b.about,
+	b.calculator
+	FROM 
+    	plans AS p
+	JOIN
+    	banks AS b ON p.fsi = b.fsi
+	WHERE 
+    	p.is_active = TRUE AND p.fsi IN (%s)
+	GROUP BY 
+		p.fsi, b.fsi, p.plan_type, p.lockin_months, p.women_benefit, p.senior_citizen_benefit, p.is_insured, p.interest_rate`
+
+	FsiDetailsQueryTest = `SELECT 
+		b.fsi AS "fsi",
+		b.name AS "name",
+		p.plan_type AS "type",
+		p.interest_rate AS "interestRate",
+		p.lockin_months AS "lockinMonths",
+		COALESCE(p.women_benefit, 0) AS "womenBenefit",
+		COALESCE(p.senior_citizen_benefit, 0) AS "seniorCitizen",
+		b.image_url AS "imageUrl",
+		b.insurance_description AS "description",
+		CASE
+			WHEN p.is_insured = true THEN COALESCE(b.insured_amount, 0)
+			ELSE 0
+		END AS "insuredAmount",
+		b.about,
+		b.calculator
+		FROM 
+			plans AS p
+		JOIN
+			banks AS b ON p.fsi = b.fsi
+		WHERE 
+			p.is_active = TRUE AND p.fsi IN (%s)`
 )
 
 // portfolio
@@ -230,13 +360,27 @@ const (
 const (
 	FetchPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1  and invalid_client = $2"
 
+	FetchPendingJourneyClientListByProviderTest = "select client_code from pending_journey_test where provider = $1  and invalid_client = $2 and pending=true"
+
+	FetchPendingJourneyWithPending = "select client_code, provider, pending, payment_pending, kyc_pending, created_at, updated_at, created_by, updated_by, to_be_refreshed, invalid_client from pending_journey_test where pending=true and p.fsi IN (%s)"
+
 	FetchRefreshPendingJourneyClientListByProvider = "select client_code from pending_journey where provider = $1 and invalid_client = $2 and to_be_refreshed = $3"
+
+	FetchRefreshPendingJourneyClientListByProviderTest = "select client_code from pending_journey_test where provider = $1 and invalid_client = $2 and to_be_refreshed = $3"
 
 	CleanStalePendingJourneyRecords = "delete from pending_journey where pending = false"
 
+	CleanStalePendingJourneyRecordsTest = "delete from pending_journey_test where pending = false"
+
 	UpdateRefreshPendingJourneyClientList = "UPDATE pending_journey SET to_be_refreshed = false, updated_by = 'pending_journey_refresher_api', updated_at = current_timestamp WHERE client_code IN (%s);"
 
+	UpdateRefreshPendingJourneyClientListTest = "UPDATE pending_journey_test SET to_be_refreshed = false, updated_by = 'pending_journey_refresher_api', updated_at = current_timestamp WHERE client_code IN (%s);"
+
 	InsertPendingJourneyDetails = `INSERT INTO pending_journey (
+		client_code, provider, pending, payment_pending, kyc_pending, created_by, updated_by, invalid_client, api_error
+	) VALUES `
+
+	InsertPendingJourneyDetailsTest = `INSERT INTO pending_journey_test (
 		client_code, provider, pending, payment_pending, kyc_pending, created_by, updated_by, invalid_client, api_error
 	) VALUES `
 

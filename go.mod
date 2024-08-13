@@ -19,14 +19,24 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
+	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/ClickHouse/clickhouse-go v1.5.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/appconfig v1.29.5 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
+	github.com/cloudflare/golz4 v0.0.0-20150217214814-ef862a3cdc58 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8 // indirect
+	github.com/denisenkom/go-mssqldb v0.12.3 // indirect
+	github.com/go-sql-driver/mysql v1.8.1 // indirect
+	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
+	github.com/golang-sql/sqlexp v0.1.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
+	github.com/pressly/goose v2.7.0+incompatible // indirect
+	github.com/ziutek/mymysql v1.5.4 // indirect
 )
 
 require (
@@ -84,9 +94,9 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect

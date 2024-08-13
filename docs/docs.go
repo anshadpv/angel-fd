@@ -222,6 +222,66 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/fsi/details": {
+            "get": {
+                "description": "Fetches all the details of FSI's that are eligible for comparision",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fsi_Details"
+                ],
+                "summary": "Get complete FSI's details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "unique request id",
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.FsiStruct"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/home": {
             "get": {
                 "description": "Get all data pertaining to home page",
@@ -261,6 +321,66 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/model.Homepage"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/homeInfo": {
+            "get": {
+                "description": "Get all data pertaining to home page",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "HomeInfo"
+                ],
+                "summary": "Get HomeInfo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "unique request id",
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.HomeInfo"
                                         }
                                     }
                                 }
@@ -534,6 +654,72 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/upswing": {
+            "get": {
+                "description": "Call upswing portfolio API and Pending journey for given Client code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "upswing"
+                ],
+                "summary": "Get portfolio and Pending journey",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authorization token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "unique request id",
+                        "name": "X-Request-Id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "source",
+                        "name": "X-Source",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/model.CombinedResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -554,6 +740,17 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "model.CombinedResponse": {
+            "type": "object",
+            "properties": {
+                "netWorthData": {
+                    "$ref": "#/definitions/model.NetWorthResponse"
+                },
+                "pendingJourney": {
+                    "$ref": "#/definitions/model.PendingJourneyResponse"
                 }
             }
         },
@@ -629,6 +826,41 @@ const docTemplate = `{
                 }
             }
         },
+        "model.FsiDetailPlans": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "fsi": {
+                    "type": "string"
+                },
+                "imageUrl": {
+                    "type": "string"
+                },
+                "insuredAmount": {
+                    "type": "integer"
+                },
+                "interestRate": {
+                    "type": "number"
+                },
+                "lockinMonths": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "seniorCitizen": {
+                    "type": "number"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "womenBenefit": {
+                    "type": "number"
+                }
+            }
+        },
         "model.FsiDetails": {
             "type": "object",
             "properties": {
@@ -664,6 +896,7 @@ const docTemplate = `{
                     "type": "object",
                     "additionalProperties": true
                 },
+                "calculator": {},
                 "compareFsi": {
                     "type": "string"
                 },
@@ -686,6 +919,54 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "plans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Plan"
+                    }
+                }
+            }
+        },
+        "model.FsiStruct": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "calculator": {},
+                "faqs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.FAQ"
+                    }
+                },
+                "plans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.FsiDetailPlans"
+                    }
+                }
+            }
+        },
+        "model.HomeInfo": {
+            "type": "object",
+            "properties": {
+                "allFDs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Plan"
+                    }
+                },
+                "faqs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.FAQ"
+                    }
+                },
+                "journey": {
+                    "$ref": "#/definitions/model.Journey"
+                },
+                "mostBought": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Plan"
@@ -749,6 +1030,20 @@ const docTemplate = `{
                 },
                 "ici": {
                     "type": "string"
+                }
+            }
+        },
+        "model.PendingJourneyResponse": {
+            "type": "object",
+            "properties": {
+                "journeyPending": {
+                    "type": "boolean"
+                },
+                "journeyPendingOnPayment": {
+                    "type": "boolean"
+                },
+                "journeyPendingOnVkyc": {
+                    "type": "boolean"
                 }
             }
         },
